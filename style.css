@@ -55,9 +55,8 @@ section.alt{background:#f3e9db;}
 .marquee-section{padding:20px 0 70px;}
 .marquee-wrap{overflow:hidden;width:100%;position:relative;-webkit-mask-image:linear-gradient(90deg,transparent,#000 6%,#000 94%,transparent);mask-image:linear-gradient(90deg,transparent,#000 6%,#000 94%,transparent);}
 .marquee-track{display:flex;gap:16px;width:max-content;animation:marquee-scroll 45s linear infinite;}
-.marquee-wrap:hover .marquee-track{animation-play-state:paused;}
-.marquee-track img{height:280px;width:auto;border-radius:10px;flex-shrink:0;box-shadow:0 6px 18px rgba(43,36,32,.15);cursor:pointer;transition:transform .25s;}
-.marquee-track img:hover{transform:scale(1.03);}
+.marquee-track img{height:280px;width:auto;border-radius:10px;flex-shrink:0;box-shadow:0 6px 18px rgba(43,36,32,.15);cursor:pointer;transition:transform .25s ease;position:relative;z-index:1;}
+.marquee-track img:hover{transform:scale(1.08);z-index:3;box-shadow:0 12px 28px rgba(43,36,32,.3);}
 @keyframes marquee-scroll{from{transform:translateX(0);}to{transform:translateX(-50%);}}
 .lightbox-overlay{position:fixed;inset:0;background:rgba(20,15,12,.94);z-index:500;display:flex;align-items:center;justify-content:center;opacity:0;pointer-events:none;transition:opacity .25s ease;touch-action:pan-y;}
 .lightbox-overlay.active{opacity:1;pointer-events:auto;}
