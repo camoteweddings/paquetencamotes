@@ -238,10 +238,54 @@ fbq('track', 'PageView');
     </div>
   </div>
 </section>
+<div class="lightbox-overlay" id="gallery-lightbox">
+<button class="lightbox-arrow lightbox-prev" aria-label="Anterior"><svg viewBox="0 0 24 24"><polyline points="15 18 9 12 15 6"></polyline></svg></button>
+<img id="gallery-lightbox-img" src="" alt="Boda Santa Cruz de la Sierra - Camote Weddings">
+<button class="lightbox-arrow lightbox-next" aria-label="Siguiente"><svg viewBox="0 0 24 24"><polyline points="9 18 15 12 9 6"></polyline></svg></button>
+</div>
 <footer class="site">
   <p>Fotografía y video de bodas en Santa Cruz de la Sierra, Bolivia</p>
   <p class="wa"><a href="https://wa.me/59177654396?text=Hola%2C%20quiero%20informaci%C3%B3n%20sobre%20paquetes%20de%20boda" target="_blank" rel="noopener" onclick="if(window.fbq)fbq('track','Lead');">+591 77654396 · @CamoteWeddings</a></p>
   <p class="fine">&copy; Camote Weddings. Todos los derechos reservados.</p>
 </footer>
+<script>(function(){
+var overlay = document.getElementById('gallery-lightbox');
+var imgEl = document.getElementById('gallery-lightbox-img');
+var prevBtn = overlay.querySelector('.lightbox-prev');
+var nextBtn = overlay.querySelector('.lightbox-next');
+var links = Array.prototype.slice.call(document.querySelectorAll('.gallery-grid .ph'));
+var urls = links.map(function(a){ return a.getAttribute('href'); });
+var current = 0;
+var wasSwipe = false;
+function show(i){ current = (i + urls.length) % urls.length; imgEl.src = urls[current]; }
+function open(i){ show(i); overlay.classList.add('active'); document.body.style.overflow='hidden'; }
+function close(){ overlay.classList.remove('active'); document.body.style.overflow=''; }
+links.forEach(function(a, i){
+a.addEventListener('click', function(e){ e.preventDefault(); open(i); });
+});
+imgEl.addEventListener('click', function(e){
+e.stopPropagation();
+if (wasSwipe) { wasSwipe = false; return; }
+close();
+});
+overlay.addEventListener('click', function(){ close(); });
+prevBtn.addEventListener('click', function(e){ e.stopPropagation(); show(current-1); });
+nextBtn.addEventListener('click', function(e){ e.stopPropagation(); show(current+1); });
+document.addEventListener('keydown', function(e){
+if (!overlay.classList.contains('active')) return;
+if (e.key === 'ArrowLeft') { show(current-1); }
+else if (e.key === 'ArrowRight') { show(current+1); }
+else if (e.key === 'Escape') { close(); }
+});
+var touchStartX = 0, touchDeltaX = 0;
+overlay.addEventListener('touchstart', function(e){ touchStartX = e.touches[0].clientX; touchDeltaX = 0; });
+overlay.addEventListener('touchmove', function(e){ touchDeltaX = e.touches[0].clientX - touchStartX; });
+overlay.addEventListener('touchend', function(e){
+if (Math.abs(touchDeltaX) > 40) {
+wasSwipe = true;
+if (touchDeltaX < 0) { show(current+1); } else { show(current-1); }
+}
+});
+})();</script>
 </body>
 </html>
