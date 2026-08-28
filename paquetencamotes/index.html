@@ -52,7 +52,13 @@ fbq('track', 'PageView');
   </div>
 </header>
 <section class="hero">
-  <div class="hero-bg" style="background-image:url(&quot;https://res.cloudinary.com/rauzqcoj/image/upload/f_auto,q_auto/VFR_9692&quot;)"></div>
+  <div class="hero-bg">
+    <div class="hero-bg-slide active" style="background-image:url(&quot;https://res.cloudinary.com/rauzqcoj/image/upload/f_auto,q_auto/VFR_7727&quot;)"></div>
+    <div class="hero-bg-slide" style="background-image:url(&quot;https://res.cloudinary.com/rauzqcoj/image/upload/f_auto,q_auto/VFR_9959&quot;)"></div>
+    <div class="hero-bg-slide" style="background-image:url(&quot;https://res.cloudinary.com/rauzqcoj/image/upload/f_auto,q_auto/VFR_7608&quot;)"></div>
+    <div class="hero-bg-slide" style="background-image:url(&quot;https://res.cloudinary.com/rauzqcoj/image/upload/f_auto,q_auto/home-fondo-boda-18&quot;)"></div>
+    <div class="hero-bg-slide" style="background-image:url(&quot;https://res.cloudinary.com/rauzqcoj/image/upload/f_auto,q_auto/retronos-atardecer-17&quot;)"></div>
+  </div>
   <div class="hero-content">
     <h1>Fotógrafo de bodas en Santa Cruz de la Sierra</h1>
     <p>Cobertura real de tu boda: preparativos, ceremonia, detalles y fiesta.</p>
@@ -96,8 +102,8 @@ fbq('track', 'PageView');
     <a class="cta" href="https://wa.me/59177654396?text=Hola%2C%20quiero%20informaci%C3%B3n%20sobre%20paquetes%20de%20boda" target="_blank" rel="noopener" onclick="if(window.fbq)fbq('track','Lead');">Quiero saber más</a>
   </div>
 </section>
-<section>
-  <div class="container center">
+<section class="center">
+  <div class="container">
     <span class="eyebrow">Momentos</span>
     <h2>Lo que capturamos</h2>
     <p class="lead">Ceremonia · Detalles · Preparativos · Fiesta · Celebración</p>
@@ -198,5 +204,15 @@ fbq('track', 'PageView');
   <p class="wa"><a href="https://wa.me/59177654396?text=Hola%2C%20quiero%20informaci%C3%B3n%20sobre%20paquetes%20de%20boda" target="_blank" rel="noopener" onclick="if(window.fbq)fbq('track','Lead');">+591 77654396 · @CamoteWeddings</a></p>
   <p class="fine">&copy; Camote Weddings. Todos los derechos reservados.</p>
 </footer>
+<script>(function(){
+  var slides = document.querySelectorAll('.hero-bg-slide');
+  if(slides.length < 2) return;
+  var idx = 0;
+  setInterval(function(){
+    slides[idx].classList.remove('active');
+    idx = (idx + 1) % slides.length;
+    slides[idx].classList.add('active');
+  }, 4000);
+})();</script>
 </body>
 </html>
