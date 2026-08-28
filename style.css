@@ -1,6 +1,6 @@
 :root{
-  --cream:#fbf6ef; --charcoal:#2b2420; --terracotta:#c1673a;
-  --terracotta-dark:#a24f2a; --gold:#c99a5b; --line:#e7dccb;
+--cream:#fbf6ef; --charcoal:#2b2420; --terracotta:#c1673a;
+--terracotta-dark:#a24f2a; --gold:#c99a5b; --line:#e7dccb;
 }
 *{box-sizing:border-box;margin:0;padding:0;}
 body{font-family:'Georgia',serif;background:var(--cream);color:var(--charcoal);line-height:1.6;}
@@ -57,6 +57,8 @@ section.alt{background:#f3e9db;}
 .marquee-track{display:flex;gap:16px;width:max-content;animation:marquee-scroll 45s linear infinite;}
 .marquee-track img{height:280px;width:auto;border-radius:10px;flex-shrink:0;box-shadow:0 6px 18px rgba(43,36,32,.15);cursor:pointer;transition:transform .25s ease;position:relative;z-index:1;}
 .marquee-track img:hover{transform:scale(1.08);z-index:3;box-shadow:0 12px 28px rgba(43,36,32,.3);}
+.marquee-track.static img{cursor:default;}
+.marquee-track.static img:hover{transform:scale(1.04);z-index:3;box-shadow:0 10px 24px rgba(43,36,32,.25);}
 @keyframes marquee-scroll{from{transform:translateX(0);}to{transform:translateX(-50%);}}
 .lightbox-overlay{position:fixed;inset:0;background:rgba(20,15,12,.94);z-index:500;display:flex;align-items:center;justify-content:center;opacity:0;pointer-events:none;transition:opacity .25s ease;touch-action:pan-y;}
 .lightbox-overlay.active{opacity:1;pointer-events:auto;}
@@ -66,10 +68,10 @@ section.alt{background:#f3e9db;}
 .lightbox-arrow:hover{opacity:.9;}
 .lightbox-prev{left:6px;} .lightbox-next{right:6px;}
 @media(max-width:640px){
-  .nav ul{width:100%;justify-content:center;order:3;}
-  .hero{min-height:70vh;}
-  .marquee-track img{height:180px;}
-  .lightbox-arrow{opacity:.28;padding:10px;}
-  .lightbox-arrow svg{width:20px;height:20px;stroke-width:1;}
-  .lightbox-arrow:active{opacity:.6;}
+.nav ul{width:100%;justify-content:center;order:3;}
+.hero{min-height:70vh;}
+.marquee-track img{height:180px;}
+.lightbox-arrow{opacity:.28;padding:10px;}
+.lightbox-arrow svg{width:20px;height:20px;stroke-width:1;}
+.lightbox-arrow:active{opacity:.6;}
 }
