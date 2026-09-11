@@ -1,0 +1,13 @@
+name = "camote-capi-relay"
+main = "worker.js"
+compatibility_date = "2026-09-11"
+
+# Variables no secretas (podés dejarlas acá o cargarlas desde el dashboard)
+[vars]
+PIXEL_ID = "1608878456861993"
+ALLOWED_ORIGIN = "https://camoteweddings.com"
+
+# El token de acceso NO va en este archivo por seguridad.
+# Se configura como secreto con:
+#   wrangler secret put META_ACCESS_TOKEN
+# (o desde el dashboard de Cloudflare: Worker -> Settings -> Variables -> Encrypt)
