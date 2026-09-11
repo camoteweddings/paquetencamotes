@@ -1,7 +1,7 @@
 // Envía el evento "Lead" tanto al Pixel del navegador como al Conversions API (server-side)
 // vía el Worker de Cloudflare, usando el mismo event_id para que Meta los deduplique.
 // CAPI_ENDPOINT se completa al desplegar el Worker (ver cloudflare-worker/worker.js).
-var CAPI_ENDPOINT = "";
+var CAPI_ENDPOINT = "https://camote-capi-relay.victorhugo9719.workers.dev";
 
 function getCookie(name) {
   var match = document.cookie.match("(?:^|; )" + name + "=([^;]*)");
