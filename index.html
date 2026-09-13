@@ -22,6 +22,7 @@
 <meta name="twitter:image" content="https://res.cloudinary.com/rauzqcoj/image/upload/f_auto,q_auto/home-fondo-boda-18">
 <script type="application/ld+json">{"@context":"https://schema.org","@type":["LocalBusiness","Organization"],"name":"Camote Weddings","url":"https://camoteweddings.com","email":"camoteweddings@gmail.com","address":{"@type":"PostalAddress","addressLocality":"santa cruz","addressRegion":"Santa Cruz de la Sierra","addressCountry":"BO"},"areaServed":[{"@type":"City","name":"Santa Cruz de la Sierra"},{"@type":"City","name":"La Paz"},{"@type":"City","name":"Cochabamba"},{"@type":"City","name":"Sucre"},{"@type":"City","name":"Oruro"},{"@type":"City","name":"Potosí"},{"@type":"City","name":"Tarija"},{"@type":"City","name":"Trinidad"},{"@type":"City","name":"Cobija"},{"@type":"Country","name":"Bolivia"}],"priceRange":"Bs 4.000 - Bs 8.800","description":"Camote Weddings es una empresa de fotografía especializada en bodas en Santa Cruz, Bolivia. Cobertura completa del día de la boda con un enfoque documental, emotivo y natural.","telephone":"+59177654396","sameAs":["https://www.instagram.com/victorframeph/","https://www.facebook.com/profile.php?id=61573482047669","https://victorframe.com/"]}</script>
 <link rel="icon" type="image/png" sizes="180x180" href="https://res.cloudinary.com/rauzqcoj/image/upload/c_pad,b_white,w_180,h_180,f_png/LOGO_CAMOTE-06">
+<link rel="shortcut icon" href="/favicon.ico">
 <link rel="stylesheet" href="style.css">
 <script async src="https://www.googletagmanager.com/gtag/js?id=G-CBFR2G0DPT"></script>
 <script>
@@ -81,6 +82,28 @@ fbq('track', 'PageView');
     <h2>Cada rincón de tu boda</h2>
     <p class="lead">Desde los preparativos hasta la última bailada, mirá algunos de los momentos que ya capturamos en Santa Cruz de la Sierra.</p>
     <a class="cta" href="galeria-de-bodas-santa-cruz-de-la-sierra/">Ver galería completa</a>
+  </div>
+</section>
+<section class="center">
+  <div class="container">
+    <span class="eyebrow">¿Todavía tenés dudas?</span>
+    <h2>Agendá una reunión gratis para despejarlas</h2>
+    <p class="lead">Antes de decidirte, coordinamos una videollamada corta y sin costo para conocernos, contarte cómo trabajamos y responder tus preguntas sobre fechas, estilo, cobertura o precios. Es el espacio ideal para resolver dudas con calma, sin presión de compra. Elegí el horario que más te acomode:</p>
+    <div style="width:100%;height:600px;overflow:scroll" id="my-cal-inline-save-the-date"></div>
+    <script type="text/javascript">
+      (function (C, A, L) { let p = function (a, ar) { a.q.push(ar); }; let d = C.document; C.Cal = C.Cal || function () { let cal = C.Cal; let ar = arguments; if (!cal.loaded) { cal.ns = {}; cal.q = cal.q || []; d.head.appendChild(d.createElement("script")).src = A; cal.loaded = true; } if (ar[0] === L) { const api = function () { p(api, arguments); }; const namespace = ar[1]; api.q = api.q || []; if(typeof namespace === "string"){cal.ns[namespace] = cal.ns[namespace] || api;p(cal.ns[namespace], ar);p(cal, ["initNamespace", namespace]);} else p(cal, ar); return;} p(cal, ar); }; })(window, "https://app.cal.com/embed/embed.js", "init");
+      Cal("init", "save-the-date", {origin:"https://app.cal.com"});
+      Cal.config = Cal.config || {};
+      Cal.config.forwardQueryParams = true;
+
+      Cal.ns["save-the-date"]("inline", {
+        elementOrSelector:"#my-cal-inline-save-the-date",
+        config: {"layout":"month_view","useSlotsViewOnSmallScreen":"true"},
+        calLink: "camoteweddings/save-the-date",
+      });
+
+      Cal.ns["save-the-date"]("ui", {"hideEventTypeDetails":false,"layout":"month_view"});
+    </script>
   </div>
 </section>
 <footer class="site">

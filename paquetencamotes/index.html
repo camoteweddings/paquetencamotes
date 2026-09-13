@@ -24,6 +24,7 @@
 <script type="application/ld+json">{"@context":"https://schema.org","@type":"FAQPage","mainEntity":[{"@type":"Question","name":"¿Nos reunimos antes de la boda?","acceptedAnswer":{"@type":"Answer","text":"Sí, siempre nos reunimos antes para conocernos, así el día de la sesión están totalmente en confianza."}},{"@type":"Question","name":"¿Hacés fotos espontáneas o dirigidas?","acceptedAnswer":{"@type":"Answer","text":"Ambas. Priorizo lo natural y espontáneo, aunque también hago fotos posadas cuando hace falta."}},{"@type":"Question","name":"¿Qué pasa si llueve o algo se retrasa?","acceptedAnswer":{"@type":"Answer","text":"Reagendamos sin costo adicional una vez, o adaptamos la cobertura al momento — siempre hay una solución."}},{"@type":"Question","name":"¿Vas sólo o con asistente?","acceptedAnswer":{"@type":"Answer","text":"Depende del paquete; para coberturas más largas trabajo con un asistente para aprovechar mejor el tiempo."}},{"@type":"Question","name":"¿Cómo reservo mi fecha?","acceptedAnswer":{"@type":"Answer","text":"Escribime por WhatsApp, coordinamos el paquete y confirmás con el depósito del 70%."}},{"@type":"Question","name":"¿Cuánto cuesta un fotógrafo de bodas en Santa Cruz de la Sierra?","acceptedAnswer":{"@type":"Answer","text":"En Camote Weddings los paquetes van desde Bs 4.000 hasta Bs 8.800, según la cobertura, la cantidad de fotos entregadas y si incluyen productos impresos o álbum físico."}},{"@type":"Question","name":"¿Cómo elegir fotógrafo de bodas en Santa Cruz de la Sierra?","acceptedAnswer":{"@type":"Answer","text":"Más allá del precio, fijate en el estilo de las fotos (natural vs. posado), si te reunís con el fotógrafo antes de la boda para conocerse, y si el paquete deja claro cuántas fotos y qué productos vas a recibir."}}]}</script>
 <script type="application/ld+json">{"@context":"https://schema.org","@type":"HowTo","name":"Cómo trabajamos en Camote Weddings","step":[{"@type":"HowToStep","name":"Planificación","text":"Nos reunimos para conocer su historia, entender qué más valoran y definir juntos los detalles de la cobertura."},{"@type":"HowToStep","name":"Cobertura","text":"El día de la boda capturamos momentos reales sin interrumpir lo que está sucediendo, con discreción y respetando el ritmo del evento."},{"@type":"HowToStep","name":"Entrega","text":"Reciben una galería de fotos editadas, lista para revivir su día una y otra vez, con opción de álbumes y productos impresos."}]}</script>
 <link rel="icon" type="image/png" sizes="180x180" href="https://res.cloudinary.com/rauzqcoj/image/upload/c_pad,b_white,w_180,h_180,f_png/LOGO_CAMOTE-06">
+<link rel="shortcut icon" href="/favicon.ico">
 <link rel="stylesheet" href="../style.css">
 <script async src="https://www.googletagmanager.com/gtag/js?id=G-CBFR2G0DPT"></script>
 <script>
@@ -258,6 +259,28 @@ fbq('track', 'PageView');
       <details><summary>¿Cuánto cuesta un fotógrafo de bodas en Santa Cruz de la Sierra?</summary><p>En Camote Weddings los paquetes van desde Bs 4.000 hasta Bs 8.800, según la cobertura, la cantidad de fotos entregadas y si incluyen productos impresos o álbum físico. Podés ver el detalle de cada paquete más arriba, en la sección de planes y precios.</p></details>
       <details><summary>¿Cómo elegir fotógrafo de bodas en Santa Cruz de la Sierra?</summary><p>Más allá del precio, fijate en el estilo de las fotos (natural vs. posado), si te reunís con el fotógrafo antes de la boda para conocerse, y si el paquete deja claro cuántas fotos y qué productos vas a recibir. Nosotros nos reunimos siempre antes de la fecha y dejamos cada paquete detallado para que no haya sorpresas.</p></details>
     </div>
+  </div>
+</section>
+<section class="alt center">
+  <div class="container">
+    <span class="eyebrow">¿Todavía tenés dudas?</span>
+    <h2>Agendá una reunión gratis para despejarlas</h2>
+    <p class="lead">Antes de comprometerte con un paquete, coordinamos una videollamada corta y sin costo para conocernos, contarte cómo trabajamos y responder cualquier pregunta sobre fechas, estilo, cobertura o precios. No es una venta a presión: es el espacio para que decidas con tranquilidad si somos el fotógrafo correcto para tu boda. Elegí el horario que más te acomode:</p>
+    <div style="width:100%;height:600px;overflow:scroll" id="my-cal-inline-save-the-date"></div>
+    <script type="text/javascript">
+      (function (C, A, L) { let p = function (a, ar) { a.q.push(ar); }; let d = C.document; C.Cal = C.Cal || function () { let cal = C.Cal; let ar = arguments; if (!cal.loaded) { cal.ns = {}; cal.q = cal.q || []; d.head.appendChild(d.createElement("script")).src = A; cal.loaded = true; } if (ar[0] === L) { const api = function () { p(api, arguments); }; const namespace = ar[1]; api.q = api.q || []; if(typeof namespace === "string"){cal.ns[namespace] = cal.ns[namespace] || api;p(cal.ns[namespace], ar);p(cal, ["initNamespace", namespace]);} else p(cal, ar); return;} p(cal, ar); }; })(window, "https://app.cal.com/embed/embed.js", "init");
+      Cal("init", "save-the-date", {origin:"https://app.cal.com"});
+      Cal.config = Cal.config || {};
+      Cal.config.forwardQueryParams = true;
+
+      Cal.ns["save-the-date"]("inline", {
+        elementOrSelector:"#my-cal-inline-save-the-date",
+        config: {"layout":"month_view","useSlotsViewOnSmallScreen":"true"},
+        calLink: "camoteweddings/save-the-date",
+      });
+
+      Cal.ns["save-the-date"]("ui", {"hideEventTypeDetails":false,"layout":"month_view"});
+    </script>
   </div>
 </section>
 <footer class="site">
