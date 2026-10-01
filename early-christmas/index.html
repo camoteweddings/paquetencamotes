@@ -335,7 +335,7 @@ fbq('track', 'PageView');
         <span class="price serif">Bs.250</span>
         <hr>
         <p>30 minutos de sesión + 10 fotos digitales editadas + galería en línea</p>
-        <button type="button" class="card-cta" onclick="seleccionarPaquete(this)">Elegir este paquete</button>
+        <button type="button" class="card-cta" onclick="reservarPaquete(this)">Reservar fecha</button>
       </div>
       <div class="card premium" data-package="Sesión Extendida">
         <span class="badge">Preventa octubre</span>
@@ -343,42 +343,14 @@ fbq('track', 'PageView');
         <span class="price serif">Bs.500</span>
         <hr>
         <p>45 minutos de sesión + 20 fotos digitales editadas + galería en línea</p>
-        <button type="button" class="card-cta" onclick="seleccionarPaquete(this)">Elegir este paquete</button>
+        <button type="button" class="card-cta" onclick="reservarPaquete(this)">Reservar fecha</button>
       </div>
-    </div>
-
-    <div class="package-select" id="packageSelect">
-      <p id="packageSelectText">Elige un paquete arriba para continuar con tu reserva.</p>
-      <a class="btn-select" id="packageSelectBtn" href="#" target="_blank" rel="noopener" onclick="trackLead();">Reservar por WhatsApp</a>
     </div>
 
     <div class="deposit-note">
       <strong>Preventa de octubre — primera oleada:</strong> estos precios (Bs.250 Mini Sesión / Bs.500 Sesión Extendida) son solo para fechas reservadas en octubre, con cupos limitados.
       Una vez que se llenen esos cupos, el precio sube: la Mini Sesión a Bs.300 (Bs.450 en reservas de último momento) y la Sesión Extendida a Bs.650. Reserva ahora para asegurar el precio de preventa.<br>
       <strong>Reserva de fecha:</strong> se aparta con el 70% del valor del paquete elegido. El 30% restante se paga el día de la sesión. Todo el servicio se realiza bajo contrato, para tu tranquilidad y la nuestra.
-    </div>
-
-    <div class="section" style="padding-top:40px;">
-      <span class="label">Elige tu fecha</span>
-    </div>
-    <div class="calendar-embed">
-      <!-- Cal inline embed code begins -->
-      <div style="width:100%;height:100%;overflow:scroll" id="my-cal-inline-minis-navidenas"></div>
-      <script type="text/javascript">
-        (function (C, A, L) { let p = function (a, ar) { a.q.push(ar); }; let d = C.document; C.Cal = C.Cal || function () { let cal = C.Cal; let ar = arguments; if (!cal.loaded) { cal.ns = {}; cal.q = cal.q || []; d.head.appendChild(d.createElement("script")).src = A; cal.loaded = true; } if (ar[0] === L) { const api = function () { p(api, arguments); }; const namespace = ar[1]; api.q = api.q || []; if(typeof namespace === "string"){cal.ns[namespace] = cal.ns[namespace] || api;p(cal.ns[namespace], ar);p(cal, ["initNamespace", namespace]);} else p(cal, ar); return;} p(cal, ar); }; })(window, "https://app.cal.com/embed/embed.js", "init");
-        Cal("init", "minis-navidenas", {origin:"https://app.cal.com"});
-        Cal.config = Cal.config || {};
-        Cal.config.forwardQueryParams = true;
-
-        Cal.ns["minis-navidenas"]("inline", {
-          elementOrSelector:"#my-cal-inline-minis-navidenas",
-          config: {"layout":"month_view","useSlotsViewOnSmallScreen":"true"},
-          calLink: "camoteweddings/minis-navidenas",
-        });
-
-        Cal.ns["minis-navidenas"]("ui", {"hideEventTypeDetails":false,"layout":"month_view"});
-      </script>
-      <!-- Cal inline embed code ends -->
     </div>
 
     <div class="section" style="padding-top:40px;">
@@ -451,27 +423,19 @@ fbq('track', 'PageView');
   </div>
 
   <script>
-    function seleccionarPaquete(btn) {
+    (function (C, A, L) { let p = function (a, ar) { a.q.push(ar); }; let d = C.document; C.Cal = C.Cal || function () { let cal = C.Cal; let ar = arguments; if (!cal.loaded) { cal.ns = {}; cal.q = cal.q || []; d.head.appendChild(d.createElement("script")).src = A; cal.loaded = true; } if (ar[0] === L) { const api = function () { p(api, arguments); }; const namespace = ar[1]; api.q = api.q || []; if(typeof namespace === "string"){cal.ns[namespace] = cal.ns[namespace] || api;p(cal.ns[namespace], ar);p(cal, ["initNamespace", namespace]);} else p(cal, ar); return;} p(cal, ar); }; })(window, "https://app.cal.com/embed/embed.js", "init");
+    Cal("init", "minis-navidenas", {origin:"https://app.cal.com"});
+    Cal.ns["minis-navidenas"]("ui", {"hideEventTypeDetails":false,"layout":"month_view"});
+
+    function reservarPaquete(btn) {
       var card = btn.closest('.card');
       var nombre = card.getAttribute('data-package');
       var precio = card.querySelector('.price').textContent.trim();
-
-      document.querySelectorAll('.card').forEach(function (c) {
-        c.classList.remove('selected');
-        c.querySelector('.card-cta').classList.remove('selected');
-        c.querySelector('.card-cta').textContent = 'Elegir este paquete';
+      if (typeof trackLead === 'function') trackLead();
+      Cal.ns["minis-navidenas"]("modal", {
+        calLink: "camoteweddings/minis-navidenas",
+        config: { layout: "month_view", notes: "Paquete: " + nombre + " (" + precio + ")" }
       });
-      card.classList.add('selected');
-      btn.classList.add('selected');
-      btn.textContent = 'Seleccionado ✓';
-
-      var mensaje = 'Hola! Quiero reservar el paquete ' + nombre + ' (' + precio + ') de Sesiones de Navidad.';
-      var link = document.getElementById('packageSelectBtn');
-      link.href = 'https://wa.me/59177654396?text=' + encodeURIComponent(mensaje);
-      link.style.display = 'inline-block';
-      document.getElementById('packageSelectText').textContent = 'Paquete seleccionado: ' + nombre + ' (' + precio + ')';
-
-      document.getElementById('packageSelect').scrollIntoView({ behavior: 'smooth', block: 'center' });
     }
   </script>
 </body>
