@@ -8,7 +8,29 @@ function getCookie(name) {
   return match ? decodeURIComponent(match[1]) : null;
 }
 
+// Un solo Lead por cliente: se recuerda en localStorage (30 días) y en memoria,
+// así varios clics en "Reservar" no generan eventos repetidos en Meta.
+var LEAD_TTL_MS = 30 * 24 * 60 * 60 * 1000;
+var leadSent = false;
+
+function leadAlreadySent() {
+  if (leadSent) return true;
+  try {
+    var t = parseInt(localStorage.getItem("camote_lead_sent"), 10);
+    if (t && Date.now() - t < LEAD_TTL_MS) return true;
+  } catch (e) {}
+  return false;
+}
+
+function markLeadSent() {
+  leadSent = true;
+  try { localStorage.setItem("camote_lead_sent", String(Date.now())); } catch (e) {}
+}
+
 function trackLead() {
+  if (leadAlreadySent()) return;
+  markLeadSent();
+
   var eventId = "lead_" + Date.now() + "_" + Math.random().toString(36).slice(2);
 
   if (window.fbq) {
