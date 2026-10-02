@@ -54,3 +54,35 @@ function trackLead() {
     }).catch(function () {});
   } catch (e) {}
 }
+
+// Reserva completada (Cal.com bookingSuccessful): evento estándar "Schedule", uno por reserva.
+// Se deduplica Pixel + servidor con el mismo event_id (uid de la reserva si existe).
+function trackSchedule(uid) {
+  var eventId = "schedule_" + (uid || Date.now() + "_" + Math.random().toString(36).slice(2));
+  try {
+    var done = (sessionStorage.getItem("camote_schedule_ids") || "").split(",");
+    if (done.indexOf(eventId) !== -1) return;
+    sessionStorage.setItem("camote_schedule_ids", done.concat(eventId).join(","));
+  } catch (e) {}
+
+  if (window.fbq) {
+    fbq("track", "Schedule", {}, { eventID: eventId });
+  }
+
+  if (!CAPI_ENDPOINT) return;
+
+  try {
+    fetch(CAPI_ENDPOINT, {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      keepalive: true,
+      body: JSON.stringify({
+        event_name: "Schedule",
+        event_id: eventId,
+        event_source_url: location.href,
+        fbp: getCookie("_fbp"),
+        fbc: getCookie("_fbc"),
+      }),
+    }).catch(function () {});
+  } catch (e) {}
+}
