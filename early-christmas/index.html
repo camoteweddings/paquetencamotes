@@ -253,7 +253,7 @@ fbq('track', 'PageView');
         <div>Cupos limitados — diciembre 2026</div>
         <div>Sesiones de 30 o 45 minutos en nuestro estudio</div>
       </div>
-      <a class="hero-cta" href="https://wa.me/59177654396" target="_blank" rel="noopener" onclick="trackLead();">Reservar mi fecha</a>
+      <a class="hero-cta" href="#paquetes">Reservar mi fecha</a>
     </div>
     <div class="hero-deco" aria-hidden="true">
       <div class="deco-star" style="top:14%; right:10%; width:52px; height:52px; transform:rotate(-8deg);">
@@ -294,7 +294,7 @@ fbq('track', 'PageView');
       <h2 class="serif">De la reserva a tus fotos impresas</h2>
     </div>
     <div class="steps">
-      <div class="step-row"><span class="step-num serif">01</span><span class="step-title">Reservas tu fecha y eliges el paquete por WhatsApp</span></div>
+      <div class="step-row"><span class="step-num serif">01</span><span class="step-title">Eliges tu paquete y reservas tu fecha en el calendario</span></div>
       <div class="step-row"><span class="step-num serif">02</span><span class="step-title">Sesión en nuestro estudio, ya ambientado con una decoración navideña minimalista y elegante</span></div>
       <div class="step-row"><span class="step-num serif">03</span><span class="step-title">Sesión guiada de 30 o 45 minutos, relajada y a ritmo de niños</span></div>
       <div class="step-row"><span class="step-num serif">04</span><span class="step-title">Seleccionas tus fotos favoritas de la galería en línea</span></div>
@@ -364,8 +364,8 @@ fbq('track', 'PageView');
     <div class="section" style="padding-top:40px;">
       <span class="label">Paquetes — preventa de octubre</span>
     </div>
-    <div class="cards">
-      <div class="card" data-package="Mini Sesión">
+    <div class="cards" id="paquetes">
+      <div class="card" data-package="Mini Sesión" data-cal-ns="minis-navidenas" data-cal-link="camoteweddings/minis-navidenas">
         <span class="badge">Preventa octubre</span>
         <span class="name serif">Mini Sesión</span>
         <span class="price serif">Bs.250</span>
@@ -373,7 +373,7 @@ fbq('track', 'PageView');
         <p>30 minutos de sesión + 10 fotos digitales editadas + galería en línea</p>
         <button type="button" class="card-cta" onclick="reservarPaquete(this)">Reservar fecha</button>
       </div>
-      <div class="card premium" data-package="Sesión Extendida">
+      <div class="card premium" data-package="Sesión Extendida" data-cal-ns="minis-navidenas-45-min" data-cal-link="camoteweddings/minis-navidenas-45-min">
         <span class="badge">Preventa octubre</span>
         <span class="name serif">Sesión Extendida</span>
         <span class="price serif">Bs.500</span>
@@ -451,7 +451,7 @@ fbq('track', 'PageView');
 
     <div class="cta">
       <p>Los cupos de diciembre son limitados — reserva tu fecha antes de que se llenen.</p>
-      <a class="btn" href="https://wa.me/59177654396" target="_blank" rel="noopener" onclick="trackLead();">Reservar por WhatsApp</a>
+      <a class="btn" href="#paquetes">Elegir mi paquete y reservar</a>
     </div>
 
     <div class="contract">Todo el servicio se realiza bajo contrato.</div>
@@ -460,14 +460,16 @@ fbq('track', 'PageView');
 
   <script>
     (function (C, A, L) { let p = function (a, ar) { a.q.push(ar); }; let d = C.document; C.Cal = C.Cal || function () { let cal = C.Cal; let ar = arguments; if (!cal.loaded) { cal.ns = {}; cal.q = cal.q || []; d.head.appendChild(d.createElement("script")).src = A; cal.loaded = true; } if (ar[0] === L) { const api = function () { p(api, arguments); }; const namespace = ar[1]; api.q = api.q || []; if(typeof namespace === "string"){cal.ns[namespace] = cal.ns[namespace] || api;p(cal.ns[namespace], ar);p(cal, ["initNamespace", namespace]);} else p(cal, ar); return;} p(cal, ar); }; })(window, "https://app.cal.com/embed/embed.js", "init");
-    Cal("init", "minis-navidenas", {origin:"https://app.cal.com"});
-    Cal.ns["minis-navidenas"]("ui", {"hideEventTypeDetails":false,"layout":"month_view"});
-    Cal.ns["minis-navidenas"]("on", {
-      action: "bookingSuccessful",
-      callback: function (e) {
-        var d = (e && e.detail && e.detail.data) || {};
-        if (typeof trackSchedule === 'function') trackSchedule(d.uid || (d.booking && d.booking.uid));
-      }
+    ["minis-navidenas", "minis-navidenas-45-min"].forEach(function (ns) {
+      Cal("init", ns, {origin:"https://app.cal.com"});
+      Cal.ns[ns]("ui", {"hideEventTypeDetails":false,"layout":"month_view"});
+      Cal.ns[ns]("on", {
+        action: "bookingSuccessful",
+        callback: function (e) {
+          var d = (e && e.detail && e.detail.data) || {};
+          if (typeof trackSchedule === 'function') trackSchedule(d.uid || (d.booking && d.booking.uid));
+        }
+      });
     });
 
     document.getElementById('galleryMore').addEventListener('click', function () {
@@ -480,8 +482,8 @@ fbq('track', 'PageView');
       var nombre = card.getAttribute('data-package');
       var precio = card.querySelector('.price').textContent.trim();
       if (typeof trackLead === 'function') trackLead();
-      Cal.ns["minis-navidenas"]("modal", {
-        calLink: "camoteweddings/minis-navidenas",
+      Cal.ns[card.getAttribute('data-cal-ns')]("modal", {
+        calLink: card.getAttribute('data-cal-link'),
         config: { layout: "month_view", notes: "Paquete: " + nombre + " (" + precio + ")" }
       });
     }
