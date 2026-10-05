@@ -481,7 +481,9 @@ fbq('track', 'PageView');
       var card = btn.closest('.card');
       var nombre = card.getAttribute('data-package');
       var precio = card.querySelector('.price').textContent.trim();
-      if (typeof trackLead === 'function') trackLead();
+      var m = precio.match(/\d+(?:[.,]\d+)?/);
+      var valor = m ? parseFloat(m[0].replace(',', '.')) : 0;
+      if (typeof trackPurchase === 'function') trackPurchase(valor, 'BOB', nombre);
       Cal.ns[card.getAttribute('data-cal-ns')]("modal", {
         calLink: card.getAttribute('data-cal-link'),
         config: { layout: "month_view", notes: "Paquete: " + nombre + " (" + precio + ")" }

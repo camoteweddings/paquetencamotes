@@ -9,6 +9,16 @@
 //   ALLOWED_ORIGIN       -> "https://camoteweddings.com" (para restringir quién puede llamar al Worker)
 //   TEST_EVENT_CODE      -> (opcional) código de prueba de Meta Events Manager, solo mientras se prueba
 
+// Solo se reenvían campos conocidos de custom_data (value, currency, content_name).
+function safeCustomData(cd) {
+  if (!cd || typeof cd !== "object") return null;
+  const out = {};
+  if (typeof cd.value === "number" && isFinite(cd.value)) out.value = cd.value;
+  if (typeof cd.currency === "string" && /^[A-Z]{3}$/.test(cd.currency)) out.currency = cd.currency;
+  if (typeof cd.content_name === "string") out.content_name = cd.content_name.slice(0, 100);
+  return Object.keys(out).length ? out : null;
+}
+
 export default {
   async fetch(request, env) {
     const allowedOrigin = env.ALLOWED_ORIGIN || "https://camoteweddings.com";
@@ -40,6 +50,7 @@ export default {
       event_source_url,
       fbp,
       fbc,
+      custom_data,
     } = payload || {};
 
     if (!event_name || !event_id) {
@@ -55,6 +66,7 @@ export default {
       event_id,
       event_source_url: event_source_url || "",
       action_source: "website",
+      ...(safeCustomData(custom_data) ? { custom_data: safeCustomData(custom_data) } : {}),
       user_data: {
         client_ip_address: clientIp,
         client_user_agent: userAgent,

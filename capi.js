@@ -86,3 +86,39 @@ function trackSchedule(uid) {
     }).catch(function () {});
   } catch (e) {}
 }
+
+// Venta: se marca al elegir un paquete y abrir el calendario de reserva.
+// Un solo Purchase por cliente (30 días). Pixel + Conversions API con el mismo event_id.
+function trackPurchase(value, currency, name) {
+  var key = "camote_purchase_sent";
+  try {
+    var t = parseInt(localStorage.getItem(key), 10);
+    if (t && Date.now() - t < LEAD_TTL_MS) return;
+    localStorage.setItem(key, String(Date.now()));
+  } catch (e) {}
+
+  var eventId = "purchase_" + Date.now() + "_" + Math.random().toString(36).slice(2);
+  var custom = { value: value, currency: currency || "BOB", content_name: name || "" };
+
+  if (window.fbq) {
+    fbq("track", "Purchase", custom, { eventID: eventId });
+  }
+
+  if (!CAPI_ENDPOINT) return;
+
+  try {
+    fetch(CAPI_ENDPOINT, {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      keepalive: true,
+      body: JSON.stringify({
+        event_name: "Purchase",
+        event_id: eventId,
+        event_source_url: location.href,
+        fbp: getCookie("_fbp"),
+        fbc: getCookie("_fbc"),
+        custom_data: custom,
+      }),
+    }).catch(function () {});
+  } catch (e) {}
+}
