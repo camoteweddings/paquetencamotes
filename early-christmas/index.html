@@ -608,12 +608,19 @@ fbq('track', 'PageView');
     }
     function mk(any) {
       var z = Math.random();
-      return { x: Math.random() * W, y: any ? Math.random() * Hh : -10, r: 0.8 + z * 2.6, v: 0.25 + z * 0.9, ph: Math.random() * 6.28, sw: 0.3 + Math.random() * 0.9, a: 0.45 + z * 0.5 };
+      return { x: Math.random() * W, y: any ? Math.random() * Hh : -10, r: 0.8 + z * 2.6, v: 0.25 + z * 0.9, ph: Math.random() * 6.28, sw: 0.3 + Math.random() * 0.9, a: 0.45 + z * 0.5, vx: 0, vy: 0 };
     }
-    var lastY = window.pageYOffset, boost = 0, running = true, last = performance.now();
+    var lastY = window.pageYOffset, boost = 0, gust = 0, running = true, last = performance.now();
     window.addEventListener('scroll', function () {
       var y = window.pageYOffset, dy = y - lastY; lastY = y;
-      boost = Math.min(boost + Math.abs(dy) * 0.12, 14);
+      if (dy >= 0) { boost = Math.min(boost + dy * 0.12, 14); return; }
+      var k = Math.min(1, 0.35 + Math.abs(dy) / 40);
+      gust = Math.min(gust + Math.abs(dy) * 0.1, 8);
+      for (var i = 0; i < flakes.length; i++) {
+        var f = flakes[i], a = Math.random() * 6.2832, m = (3 + Math.random() * 7) * k * (0.6 + f.r / 3);
+        f.vx = Math.max(-22, Math.min(22, f.vx + Math.cos(a) * m));
+        f.vy = Math.max(-22, Math.min(22, f.vy + Math.sin(a) * m - 1.5 * k));
+      }
     }, { passive: true });
     document.addEventListener('visibilitychange', function () { running = !document.hidden; if (running) { last = performance.now(); requestAnimationFrame(tick); } });
     window.addEventListener('resize', size);
@@ -623,6 +630,7 @@ fbq('track', 'PageView');
       if (!running) return;
       var dt = Math.min((now - last) / 16.7, 3); last = now;
       boost *= Math.pow(0.94, dt);
+      gust *= Math.pow(0.95, dt);
       cx.clearRect(0, 0, W, Hh);
       cx.fillStyle = '#fff';
       cx.shadowColor = 'rgba(70,80,100,0.6)'; cx.shadowBlur = 3;
@@ -630,9 +638,14 @@ fbq('track', 'PageView');
       for (var i = 0; i < flakes.length; i++) {
         var f = flakes[i];
         f.ph += 0.02 * f.sw * dt;
-        f.y += f.v * speedMul * dt * 1.6;
-        f.x += Math.sin(f.ph) * 0.5 * dt + 0.15 * dt;
-        if (f.y > Hh + 10 || f.x > W + 10) { var n = mk(false); f.x = Math.random() * W; f.y = -10; f.r = n.r; f.v = n.v; f.a = n.a; }
+        var fr = Math.pow(0.965, dt);
+        f.vx *= fr; f.vy *= fr;
+        if (gust > 0.4) { f.vx += Math.sin(f.ph * 4 + f.y / 55) * gust * 0.06 * dt; f.vy += Math.cos(f.ph * 3 + f.x / 70) * gust * 0.05 * dt; }
+        f.y += f.v * speedMul * dt * 1.6 + f.vy * dt;
+        f.x += Math.sin(f.ph) * 0.5 * dt + 0.15 * dt + f.vx * dt;
+        if (f.x < -20) f.x = W + 20; else if (f.x > W + 20) f.x = -20;
+        if (f.y < -20) f.y = Hh + 10;
+        if (f.y > Hh + 10) { var n = mk(false); f.x = Math.random() * W; f.y = -10; f.r = n.r; f.v = n.v; f.a = n.a; f.vx = 0; f.vy = 0; }
         cx.globalAlpha = f.a;
         cx.beginPath(); cx.arc(f.x, f.y, f.r, 0, 6.2832); cx.fill();
       }
