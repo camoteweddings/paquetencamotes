@@ -467,8 +467,8 @@
       var f = Math.min(-d, 120);
       wind += f * 0.9;
       flakes.forEach(function (p) {
-        p.uy -= f * (6 + Math.random() * 10) * (0.6 + p.r / 4);   // vuelan hacia arriba
-        p.ux += (Math.random() - .35) * f * 8;                    // y a los lados
+        p.uy -= 0.4 * f * (6 + Math.random() * 10) * (0.6 + p.r / 4);   // vuelan hacia arriba
+        p.ux += 0.4 * (Math.random() - .35) * f * 8;                    // y a los lados
       });
     }
   }, { passive: true });
