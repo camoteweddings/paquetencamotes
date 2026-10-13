@@ -222,6 +222,12 @@
   .wa-float { position: fixed; right: 18px; bottom: 18px; z-index: 999; display: flex; align-items: center; gap: 10px; background: #25D366; color: #fff; text-decoration: none; font-weight: 600; font-size: 13.5px; line-height: 1.25; padding: 12px 18px; border-radius: 999px; box-shadow: 0 6px 18px rgba(0,0,0,0.28); max-width: calc(100vw - 36px); }
   .wa-float:hover { background: #1EBE5B; }
   .wa-float svg { width: 22px; height: 22px; flex: none; fill: #fff; }
+
+  /* ---- nieve ---- */
+  body { position: relative; }
+  #snowFall { position: fixed; inset: 0; width: 100%; height: 100%; pointer-events: none; z-index: 30; }
+  #snowCaps { position: absolute; left: 0; top: 0; width: 100%; overflow: hidden; pointer-events: none; z-index: 20; }
+  #snowCaps svg { position: absolute; overflow: visible; filter: drop-shadow(0 1px 1.2px rgba(27,18,12,0.28)); }
 </style>
 <script async src="https://www.googletagmanager.com/gtag/js?id=G-CBFR2G0DPT"></script>
 <script>
@@ -499,6 +505,142 @@ fbq('track', 'PageView');
         config: { layout: "month_view", notes: "Paquete: " + nombre + " (" + precio + ")" }
       });
     }
+  </script>
+
+  <canvas id="snowFall" aria-hidden="true"></canvas>
+  <div id="snowCaps" aria-hidden="true"></div>
+  <script>
+  (function () {
+    var reduce = window.matchMedia && matchMedia('(prefers-reduced-motion: reduce)').matches;
+
+    /* ---------- nieve acumulada en los bordes ---------- */
+    var TARGETS = '.card, .steps, .why, .faq, .deposit-note, .cta, .extras table, .package-select, .calendar-embed, .sample-photo, .mdf-wall, .print-stack, .gallery-grid';
+    var layer = document.getElementById('snowCaps');
+
+    function rng(seed) {
+      return function () {
+        seed |= 0; seed = seed + 0x6D2B79F5 | 0;
+        var t = Math.imul(seed ^ seed >>> 15, 1 | seed);
+        t = t + Math.imul(t ^ t >>> 7, 61 | t) ^ t;
+        return ((t ^ t >>> 14) >>> 0) / 4294967296;
+      };
+    }
+
+    function capSvg(w, seed) {
+      var r = rng(seed * 9301 + 49297);
+      var p1 = r() * 6.28, p2 = r() * 6.28, p3 = r() * 6.28;
+      var base = 4 + r() * 3;
+      var clumps = [], gaps = [], i;
+      var nC = Math.max(2, Math.round(w / 140));
+      for (i = 0; i < nC; i++) clumps.push({ x: r() * w, h: 5 + r() * 10, s: 14 + r() * 34 });
+      var nG = Math.max(1, Math.round(w / 260));
+      for (i = 0; i < nG; i++) gaps.push({ x: r() * w, s: 20 + r() * 50 });
+
+      var step = 5 + r() * 2, xs = [], top = [], bot = [], maxT = 0;
+      for (var x = 0; x <= w + 0.1; x += step) {
+        var t = base + 2.6 * Math.abs(Math.sin(x / 41 + p1)) + 1.6 * Math.sin(x / 15 + p2) + 1.2 * Math.sin(x / 7 + p3) + r() * 1.4;
+        for (i = 0; i < clumps.length; i++) { var d = (x - clumps[i].x) / clumps[i].s; t += clumps[i].h * Math.exp(-d * d); }
+        for (i = 0; i < gaps.length; i++) { var g = (x - gaps[i].x) / gaps[i].s; t *= 1 - 0.8 * Math.exp(-g * g); }
+        var edge = Math.min(x, w - x);
+        if (edge < 12) t *= 0.55 + 0.45 * (edge / 12);
+        t = Math.max(0.8, t);
+        xs.push(Math.min(x, w));
+        top.push(t);
+        bot.push(1 + r() * 3.5 + (r() > 0.93 ? 5 + r() * 7 : 0));
+        if (t > maxT) maxT = t;
+      }
+      var H = Math.ceil(maxT + 16), by = Math.ceil(maxT + 1);
+      var n = xs.length, d1 = 'M' + xs[0] + ',' + (by - top[0] * 0.4);
+      for (i = 1; i < n; i++) {
+        var mx = (xs[i - 1] + xs[i]) / 2, my = by - (top[i - 1] + top[i]) / 2;
+        d1 += 'Q' + xs[i - 1] + ',' + (by - top[i - 1]) + ' ' + mx + ',' + my;
+      }
+      d1 += 'L' + xs[n - 1] + ',' + (by + bot[n - 1] + 4);
+      for (i = n - 1; i > 0; i--) {
+        var bx = (xs[i] + xs[i - 1]) / 2, bY = by + (bot[i] + bot[i - 1]) / 2;
+        d1 += 'Q' + xs[i] + ',' + (by + bot[i]) + ' ' + bx + ',' + bY;
+      }
+      d1 += 'Z';
+      return { d: d1, H: H, by: by };
+    }
+
+    var built = false, timer;
+    function buildCaps() {
+      layer.innerHTML = '';
+      layer.style.height = '0px';
+      var docH = Math.max(document.documentElement.scrollHeight, document.body.scrollHeight);
+      layer.style.height = docH + 'px';
+      var sx = window.pageXOffset || 0, sy = window.pageYOffset || 0;
+      var nodes = document.querySelectorAll(TARGETS), idx = 0, html = '';
+      for (var k = 0; k < nodes.length; k++) {
+        var el = nodes[k], rc = el.getBoundingClientRect();
+        if (rc.width < 90 || rc.height < 30) continue;
+        if (el.closest('.hero')) continue;
+        var cs = getComputedStyle(el);
+        if (cs.display === 'none' || cs.visibility === 'hidden') continue;
+        idx++;
+        var s = capSvg(rc.width, idx + Math.round(rc.width));
+        html += '<svg width="' + rc.width + '" height="' + s.H + '" viewBox="0 0 ' + rc.width + ' ' + s.H + '" style="left:' + (rc.left + sx) + 'px;top:' + (rc.top + sy - s.by) + 'px"><path d="' + s.d + '" fill="#fff"/></svg>';
+      }
+      layer.innerHTML = html;
+      built = true;
+    }
+    function scheduleBuild() { clearTimeout(timer); timer = setTimeout(buildCaps, 120); }
+
+    window.addEventListener('load', buildCaps);
+    window.addEventListener('resize', scheduleBuild);
+    if (document.fonts && document.fonts.ready) document.fonts.ready.then(scheduleBuild);
+    if (window.ResizeObserver) new ResizeObserver(scheduleBuild).observe(document.body);
+    document.getElementById('galleryMore').addEventListener('click', scheduleBuild);
+    buildCaps();
+
+    /* ---------- copos que caen al deslizar ---------- */
+    if (reduce) return;
+    var cv = document.getElementById('snowFall'), cx = cv.getContext('2d');
+    var W = 0, Hh = 0, dpr = Math.min(window.devicePixelRatio || 1, 2), flakes = [];
+    function size() {
+      W = window.innerWidth; Hh = window.innerHeight;
+      cv.width = W * dpr; cv.height = Hh * dpr;
+      cx.setTransform(dpr, 0, 0, dpr, 0, 0);
+      var count = Math.round(Math.min(110, Math.max(40, W / 11)));
+      while (flakes.length < count) flakes.push(mk(true));
+      flakes.length = count;
+    }
+    function mk(any) {
+      var z = Math.random();
+      return { x: Math.random() * W, y: any ? Math.random() * Hh : -10, r: 0.8 + z * 2.6, v: 0.25 + z * 0.9, ph: Math.random() * 6.28, sw: 0.3 + Math.random() * 0.9, a: 0.45 + z * 0.5 };
+    }
+    var lastY = window.pageYOffset, boost = 0, running = true, last = performance.now();
+    window.addEventListener('scroll', function () {
+      var y = window.pageYOffset, dy = y - lastY; lastY = y;
+      boost = Math.min(boost + Math.abs(dy) * 0.12, 14);
+    }, { passive: true });
+    document.addEventListener('visibilitychange', function () { running = !document.hidden; if (running) { last = performance.now(); requestAnimationFrame(tick); } });
+    window.addEventListener('resize', size);
+    size();
+
+    function tick(now) {
+      if (!running) return;
+      var dt = Math.min((now - last) / 16.7, 3); last = now;
+      boost *= Math.pow(0.94, dt);
+      cx.clearRect(0, 0, W, Hh);
+      cx.fillStyle = '#fff';
+      cx.shadowColor = 'rgba(70,80,100,0.6)'; cx.shadowBlur = 3;
+      var speedMul = 0.55 + boost;
+      for (var i = 0; i < flakes.length; i++) {
+        var f = flakes[i];
+        f.ph += 0.02 * f.sw * dt;
+        f.y += f.v * speedMul * dt * 1.6;
+        f.x += Math.sin(f.ph) * 0.5 * dt + 0.15 * dt;
+        if (f.y > Hh + 10 || f.x > W + 10) { var n = mk(false); f.x = Math.random() * W; f.y = -10; f.r = n.r; f.v = n.v; f.a = n.a; }
+        cx.globalAlpha = f.a;
+        cx.beginPath(); cx.arc(f.x, f.y, f.r, 0, 6.2832); cx.fill();
+      }
+      cx.globalAlpha = 1;
+      requestAnimationFrame(tick);
+    }
+    requestAnimationFrame(tick);
+  })();
   </script>
 </body>
 </html>

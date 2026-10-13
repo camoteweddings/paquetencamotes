@@ -43,8 +43,8 @@
   input.err { border-color:var(--maroon); background:#fdf1f1; }
 
   /* Navidad */
-  header { position:relative; overflow:hidden; padding:34px 24px 26px; background:radial-gradient(ellipse at 50% 0%, #3a2418 0%, var(--night) 70%); }
-  header img { height:54px; width:auto; display:block; margin:0 auto; filter:brightness(0) invert(1) drop-shadow(0 0 10px rgba(228,201,137,.45)); position:relative; z-index:2; }
+  header { position:relative; overflow:hidden; padding:42px 20px 30px; background:radial-gradient(ellipse at 50% 0%, #3a2418 0%, var(--night) 70%); }
+  header img { height:92px; max-width:80%; object-fit:contain; width:auto; display:block; margin:0 auto; filter:brightness(0) invert(1) drop-shadow(0 0 10px rgba(228,201,137,.45)); position:relative; z-index:2; }
   .tag { position:relative; z-index:2; margin-top:10px; font-family:'Playfair Display',Georgia,serif; font-style:italic; color:#E4C989; font-size:14px; }
   .lights { position:absolute; top:0; left:0; right:0; height:30px; display:flex; justify-content:space-around; z-index:1; pointer-events:none; }
   .lights::before { content:""; position:absolute; left:-2%; right:-2%; top:6px; height:14px; border-bottom:2px solid #5b4a38; border-radius:0 0 50% 50% / 0 0 100% 100%; }
@@ -64,6 +64,21 @@
   footer { text-align:center; color:var(--muted); font-size:13px; padding:0 20px 40px; }
   footer span { color:var(--gold); letter-spacing:6px; }
   @media (prefers-reduced-motion: reduce) { .snow, .lights i, .star { animation:none; } .snow { display:none; } }
+  input, select { font-size:16px; min-height:48px; width:100%; -webkit-appearance:none; appearance:none; }
+  input[type=checkbox] { width:22px; min-height:22px; flex-shrink:0; -webkit-appearance:auto; appearance:auto; }
+  .btn { min-height:54px; font-size:15px; }
+  .linkbtn { padding:10px 4px; font-size:14px; }
+  @media (max-width:560px) {
+    header img { height:80px; }
+    main { padding:22px 14px 48px; }
+    fieldset { padding:16px 14px; }
+    .terms { max-height:260px; font-size:14px; }
+    canvas { height:200px; }
+    .lights i:nth-child(n+11) { display:none; }
+    .star:nth-of-type(n+5) { display:none; }
+  }
+  html { -webkit-text-size-adjust:100%; }
+  body { overflow-x:hidden; padding-bottom:env(safe-area-inset-bottom); }
 </style>
 </head>
 <body>
