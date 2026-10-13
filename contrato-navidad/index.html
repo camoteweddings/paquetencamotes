@@ -464,10 +464,12 @@
   window.addEventListener("scroll", function () {
     var y = window.pageYOffset, d = y - lastY; lastY = y;
     if (d < 0) {                                       // scroll hacia arriba: soplido suave
-      var f = Math.min(-d, 40);
+      var f = Math.min(-d, 50);
       flakes.forEach(function (p) {
-        p.uy = Math.max(p.uy - f * (0.5 + Math.random() * 0.8) * (0.6 + p.r / 5), -70);   // tope de empuje
-        p.ux = Math.max(-45, Math.min(45, p.ux + (Math.random() - .5) * f * 0.8));
+        if (p.g === undefined) p.g = 0.4 + Math.random() * 1.4;      // cada copo reacciona distinto
+        var disp = (Math.random() - .5) * f * 2.2 * p.g;             // dispersión lateral
+        p.uy = Math.max(p.uy - f * (0.6 + Math.random() * 1.0) * p.g * (0.6 + p.r / 5), -115);
+        p.ux = Math.max(-85, Math.min(85, p.ux + disp));
       });
     }
   }, { passive: true });

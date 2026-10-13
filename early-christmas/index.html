@@ -628,7 +628,7 @@ fbq('track', 'PageView');
     var lastY = window.pageYOffset, boost = 0, gust = 0, running = true, last = performance.now();
     window.addEventListener('scroll', function () {
       var y = window.pageYOffset, dy = y - lastY; lastY = y;
-      if (dy >= 0) { boost = Math.min(boost + dy * 0.12, 14); return; }
+      if (dy >= 0) return;
       var k = Math.min(1, 0.35 + Math.abs(dy) / 40);
       gust = Math.min(gust + Math.abs(dy) * 0.1, 8);
       for (var i = 0; i < flakes.length; i++) {
