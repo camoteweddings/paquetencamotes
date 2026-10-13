@@ -630,11 +630,11 @@ fbq('track', 'PageView');
       var y = window.pageYOffset, dy = y - lastY; lastY = y;
       if (dy >= 0) return;
       var k = Math.min(1, 0.35 + Math.abs(dy) / 40);
-      gust = Math.min(gust + Math.abs(dy) * 0.1, 8);
+      gust = Math.min(gust + Math.abs(dy) * 0.05, 4);
       for (var i = 0; i < flakes.length; i++) {
-        var f = flakes[i], a = Math.random() * 6.2832, m = (3 + Math.random() * 7) * k * (0.6 + f.r / 3);
-        f.vx = Math.max(-22, Math.min(22, f.vx + Math.cos(a) * m));
-        f.vy = Math.max(-22, Math.min(22, f.vy + Math.sin(a) * m - 1.5 * k));
+        var f = flakes[i], a = Math.random() * 6.2832, m = (3 + Math.random() * 7) * 0.5 * k * (0.6 + f.r / 3);
+        f.vx = Math.max(-11, Math.min(11, f.vx + Math.cos(a) * m));
+        f.vy = Math.max(-11, Math.min(11, f.vy + Math.sin(a) * m - 0.75 * k));
       }
     }, { passive: true });
     document.addEventListener('visibilitychange', function () { running = !document.hidden; if (running) { last = performance.now(); requestAnimationFrame(tick); } });
