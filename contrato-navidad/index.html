@@ -54,16 +54,13 @@
   .star { position:absolute; z-index:1; pointer-events:none; animation:sp 3s ease-in-out infinite; }
   .star svg { width:100%; height:100%; display:block; filter:drop-shadow(0 0 6px rgba(228,201,137,.7)); }
   @keyframes sp { 0%,100% { transform:scale(1) rotate(0); opacity:.9; } 50% { transform:scale(.7) rotate(15deg); opacity:.5; } }
-  .snow { position:fixed; inset:0; pointer-events:none; z-index:50; overflow:hidden; }
-  .snow b { position:absolute; top:-12px; width:var(--s); height:var(--s); border-radius:50%; background:#fff; opacity:.75; box-shadow:0 0 6px rgba(255,255,255,.9); animation:fall linear infinite; }
-  @keyframes fall { to { transform:translate3d(var(--x),105vh,0); } }
   fieldset { border-color:#d9c48f; box-shadow:0 4px 14px rgba(122,32,32,.06); }
   legend::before { content:"✦ "; color:var(--gold); }
   legend::after { content:" ✦"; color:var(--gold); }
   .garland { height:10px; margin:0 0 26px; background:repeating-linear-gradient(90deg,#7A2020 0 18px,#C9A24B 18px 36px,#1B3A2F 36px 54px); opacity:.9; border-radius:4px; }
   footer { text-align:center; color:var(--muted); font-size:13px; padding:0 20px 40px; }
   footer span { color:var(--gold); letter-spacing:6px; }
-  @media (prefers-reduced-motion: reduce) { .snow, .lights i, .star { animation:none; } .snow { display:none; } }
+  @media (prefers-reduced-motion: reduce) { .lights i, .star, .bulb { animation:none; } }
   input, select { font-size:16px; min-height:48px; width:100%; -webkit-appearance:none; appearance:none; }
   input[type=checkbox] { width:22px; min-height:22px; flex-shrink:0; -webkit-appearance:auto; appearance:auto; }
   .btn { min-height:54px; font-size:15px; }
@@ -95,8 +92,13 @@
   .msg.ok { color:#9fe3b0; }
   footer { color:#b8c4ba; }
   fieldset { background:#FFFDF8; box-shadow:0 8px 24px rgba(0,0,0,.35); }
-  .snow b { opacity:.9; box-shadow:0 0 8px rgba(255,255,255,1); }
   legend { background:#FFFDF8; border:1px solid #d9c48f; border-radius:999px; padding:4px 14px; font-size:14px; }
+  #tree { position:fixed; left:50%; bottom:-2vh; transform:translateX(-50%); width:min(96vw,640px); height:96vh; z-index:0; pointer-events:none; opacity:.42; filter:blur(2.2px); }
+  #tree svg { width:100%; height:100%; display:block; }
+  .bulb { animation:bulb 3.2s ease-in-out infinite; }
+  @keyframes bulb { 0%,100% { opacity:.95; } 50% { opacity:.35; } }
+  #snow { position:fixed; inset:0; width:100%; height:100%; pointer-events:none; z-index:50; }
+  header, main, footer { position:relative; z-index:1; }
 </style>
 </head>
 <body>
@@ -160,17 +162,11 @@
   </form>
 </main>
 <footer><span>✦ ✦ ✦</span><br>¡Felices fiestas! — Camote Weddings</footer>
-<div class="snow" id="snow"></div>
+<div id="tree" aria-hidden="true"></div>
+<canvas id="snow" aria-hidden="true"></canvas>
 
 <script>
 (function () {
-  var sn = $s();
-  function $s() { return document.getElementById("snow"); }
-  for (var i = 0; i < 28; i++) {
-    var b = document.createElement("b");
-    b.style.cssText = "left:" + (Math.random() * 100) + "%;--s:" + (2 + Math.random() * 4).toFixed(1) + "px;--x:" + ((Math.random() * 80) - 40).toFixed(0) + "px;animation-duration:" + (9 + Math.random() * 12).toFixed(1) + "s;animation-delay:-" + (Math.random() * 20).toFixed(1) + "s";
-    sn.appendChild(b);
-  }
   var STUDIO = "Camote Weddings";
   var $ = function (id) { return document.getElementById(id); };
 
@@ -395,6 +391,110 @@
       catch (err) { m.textContent = "Error al generar el PDF. Intenta de nuevo."; }
     });
   });
+})();
+
+// Árbol de fondo
+(function () {
+  var rnd = (function (a) { return function () { a = (a * 1664525 + 1013904223) % 4294967296; return a / 4294967296; }; })(7);
+  var W = 400, H = 700, cx = 200, out = "", lights = "";
+  var tiers = 9, top = 70, bottom = 640;
+  for (var t = 0; t < tiers; t++) {
+    var y0 = top + t * ((bottom - top) / tiers) * 0.82;
+    var h = 120 + t * 14, hw = 34 + t * 19;
+    var pts = [[cx, y0]];
+    var n = 16;
+    for (var i = 1; i <= n; i++) {                       // borde derecho dentado
+      var k = i / n, x = cx + hw * k + (i % 2 ? 6 : -4) + rnd() * 5, y = y0 + h * k * 0.9 + (i % 2 ? 7 : 0);
+      pts.push([x, y]);
+    }
+    pts.push([cx + hw * 0.55, y0 + h * 1.02]);
+    pts.push([cx - hw * 0.55, y0 + h * 1.02]);
+    for (i = n; i >= 1; i--) {                           // borde izquierdo dentado
+      k = i / n; x = cx - hw * k - (i % 2 ? 6 : -4) - rnd() * 5; y = y0 + h * k * 0.9 + (i % 2 ? 7 : 0);
+      pts.push([x, y]);
+    }
+    var shade = 30 + t * 2;
+    out += '<polygon points="' + pts.map(function (p) { return p[0].toFixed(1) + "," + p[1].toFixed(1); }).join(" ") +
+           '" fill="hsl(150,45%,' + (shade - 12) + '%)" stroke="hsl(145,40%,' + (shade + 6) + '%)" stroke-width="1.5"/>';
+    for (var j = 0; j < 14 + t * 3; j++) {               // ramitas de aguja
+      var bx = cx + (rnd() - .5) * hw * 1.7, by = y0 + h * (.15 + rnd() * .85);
+      out += '<path d="M' + bx.toFixed(0) + ' ' + by.toFixed(0) + ' l' + ((rnd() - .5) * 26).toFixed(0) + ' ' + (8 + rnd() * 10).toFixed(0) +
+             '" stroke="hsl(140,50%,' + (shade + 12) + '%)" stroke-width="2" stroke-linecap="round" opacity=".7"/>';
+    }
+    for (j = 0; j < 4 + t; j++) {                        // luces
+      var lx = cx + (rnd() - .5) * hw * 1.6, ly = y0 + h * (.25 + rnd() * .7);
+      var c = ["#ff5a5a", "#ffd45e", "#7dffb0", "#ffffff", "#ff9be0"][Math.floor(rnd() * 5)];
+      lights += '<circle class="bulb" cx="' + lx.toFixed(0) + '" cy="' + ly.toFixed(0) + '" r="' + (3 + rnd() * 3).toFixed(1) +
+                '" fill="' + c + '" style="animation-delay:' + (rnd() * 3).toFixed(1) + 's"/>' +
+                '<circle cx="' + lx.toFixed(0) + '" cy="' + ly.toFixed(0) + '" r="10" fill="' + c + '" opacity=".25"/>';
+    }
+  }
+  var star = '<polygon points="200,18 207,48 238,49 213,66 222,96 200,78 178,96 187,66 162,49 193,48" fill="#E4C989"/>' +
+             '<circle cx="200" cy="58" r="26" fill="#E4C989" opacity=".25"/>';
+  document.getElementById("tree").innerHTML =
+    '<svg viewBox="0 0 ' + W + " " + H + '" preserveAspectRatio="xMidYMax meet">' +
+    '<rect x="186" y="610" width="28" height="80" fill="#3b2616"/>' + out + lights + star + "</svg>";
+})();
+
+// Nieve con física: cae natural y el scroll hacia arriba la sopla
+(function () {
+  var cv = document.getElementById("snow"), ctx = cv.getContext("2d");
+  if (window.matchMedia && matchMedia("(prefers-reduced-motion: reduce)").matches) { cv.style.display = "none"; return; }
+  var w, h, dpr, flakes = [], N = window.innerWidth < 600 ? 70 : 130;
+  var wind = 0, lastY = window.pageYOffset, t0 = performance.now();
+
+  function size() {
+    dpr = Math.min(window.devicePixelRatio || 1, 2);
+    w = window.innerWidth; h = window.innerHeight;
+    cv.width = w * dpr; cv.height = h * dpr; ctx.setTransform(dpr, 0, 0, dpr, 0, 0);
+  }
+  function flake(initial) {
+    var r = 1 + Math.random() * 3;
+    return {
+      x: Math.random() * w, y: initial ? Math.random() * h : -10,
+      r: r, vy: 18 + r * 14 + Math.random() * 14,      // px/s, más grandes caen más rápido
+      vx: 0, ux: 0, uy: 0,                             // impulso del soplido
+      ph: Math.random() * 6.28, sw: 8 + Math.random() * 14, a: .5 + Math.random() * .5
+    };
+  }
+  size();
+  for (var i = 0; i < N; i++) flakes.push(flake(true));
+  window.addEventListener("resize", size);
+
+  window.addEventListener("scroll", function () {
+    var y = window.pageYOffset, d = y - lastY; lastY = y;
+    if (d < 0) {                                       // scroll hacia arriba: soplido
+      var f = Math.min(-d, 120);
+      wind += f * 0.9;
+      flakes.forEach(function (p) {
+        p.uy -= f * (6 + Math.random() * 10) * (0.6 + p.r / 4);   // vuelan hacia arriba
+        p.ux += (Math.random() - .35) * f * 8;                    // y a los lados
+      });
+    }
+  }, { passive: true });
+
+  function frame(now) {
+    var dt = Math.min((now - t0) / 1000, 0.05); t0 = now;
+    ctx.clearRect(0, 0, w, h);
+    wind *= Math.pow(0.35, dt);
+    for (var i = 0; i < flakes.length; i++) {
+      var p = flakes[i];
+      p.ph += dt * (0.8 + p.r * 0.2);
+      // los impulsos se amortiguan y la gravedad retoma el control
+      p.ux *= Math.pow(0.12, dt); p.uy *= Math.pow(0.18, dt);
+      p.x += (Math.sin(p.ph) * p.sw + p.ux) * dt;
+      p.y += (p.vy + p.uy) * dt;
+      if (p.y > h + 10) { flakes[i] = flake(false); flakes[i].x = Math.random() * w; continue; }
+      if (p.y < -30) { p.y = h + 5 * Math.random(); }
+      if (p.x < -10) p.x = w + 10; else if (p.x > w + 10) p.x = -10;
+      ctx.beginPath(); ctx.arc(p.x, p.y, p.r, 0, 6.2832);
+      ctx.fillStyle = "rgba(255,255,255," + p.a.toFixed(2) + ")";
+      ctx.shadowColor = "rgba(255,255,255,.9)"; ctx.shadowBlur = p.r * 2.5;
+      ctx.fill();
+    }
+    requestAnimationFrame(frame);
+  }
+  requestAnimationFrame(frame);
 })();
 </script>
 </body>
