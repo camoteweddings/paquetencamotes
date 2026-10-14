@@ -215,7 +215,7 @@
     .cards, .samples { padding-left: 64px; padding-right: 64px; }
     .note, .extras, .contract { padding-left: 64px; padding-right: 64px; }
     .hero-text { left: 64px; right: 64px; }
-    nav.site-nav { padding-left: 64px; padding-right: 64px; }
+    nav.site-nav { padding-left: 24px; padding-right: 24px; }
   }
 
   /* ---- botón flotante WhatsApp ---- */
@@ -255,6 +255,15 @@
   @keyframes glB { 0%, 100% { opacity: .25; } 50% { opacity: 1; } }
   @media (prefers-reduced-motion: reduce) { .gl::before, .gl::after { animation: none; } }
 
+
+  /* ---- menú: logo grande y centrado ---- */
+  nav.site-nav { flex-direction: column; align-items: center; justify-content: center; gap: 8px; padding: 42px 24px 16px; }
+  .nav-logo { display: block; }
+  .nav-logo img { height: 84px; width: auto; display: block; filter: brightness(0) invert(1); }
+  .nav-home { color: var(--cream); text-decoration: none; font-size: 0.95rem; letter-spacing: 1px; text-transform: uppercase; text-align: center; }
+  .nav-home:hover { color: var(--gold-soft); }
+  @media (max-width: 520px) { .nav-logo img { height: 70px; } .nav-home { font-size: 0.85rem; } }
+
   /* ---- nieve ---- */
   body { position: relative; }
   #snowFall { position: fixed; inset: 0; width: 100%; height: 100%; pointer-events: none; z-index: 30; }
@@ -280,8 +289,8 @@ fbq('track', 'PageView');
 <body>
 
   <nav class="site-nav">
-    <a href="../"><img src="https://res.cloudinary.com/rauzqcoj/image/upload/f_auto,q_auto/LOGO_CAMOTE-06" alt="Camote Weddings" style="height:44px;width:auto;display:block;filter:brightness(0) invert(1)"></a>
-    <a href="../" style="color:#FAF8F3;text-decoration:none;font-size:.9rem">Inicio</a>
+    <a class="nav-logo" href="../"><img src="https://res.cloudinary.com/rauzqcoj/image/upload/e_trim,f_auto,q_auto,w_400/LOGO_CAMOTE-06" alt="Camote Weddings"></a>
+    <a class="nav-home" href="../">Inicio</a>
   </nav>
 
   <div class="hero">
