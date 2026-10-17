@@ -370,7 +370,29 @@
     doc.text("Firmado digitalmente el " + fechaFirma + " a las " + ahora.toLocaleTimeString("es-BO", { hour: "2-digit", minute: "2-digit" }), M, ly + 20);
 
     var slug = $("nombre").value.trim().toLowerCase().normalize("NFD").replace(/[̀-ͯ]/g, "").replace(/[^a-z0-9]+/g, "-").replace(/^-|-$/g, "");
-    doc.save("contrato-navidad-" + (slug || "cliente") + ".pdf");
+    var nombre = "contrato-navidad-" + (slug || "cliente") + ".pdf";
+    doc.save(nombre);
+    return { blob: doc.output("blob"), name: nombre };
+  }
+
+  // Envío automático del contrato firmado a Camote Weddings (FormSubmit).
+  var ENVIO_URL = "https://formsubmit.co/ajax/camoteweddings@gmail.com";
+  function enviarContrato(pdf) {
+    var p = pkg(), fd = new FormData();
+    fd.append("_subject", "Contrato firmado: " + $("nombre").value.trim() + " — " + p.nombre);
+    fd.append("_captcha", "false");
+    fd.append("_template", "table");
+    fd.append("Cliente", $("nombre").value.trim());
+    fd.append("CI", $("ci").value.trim());
+    fd.append("Telefono", $("tel").value.trim());
+    fd.append("Correo", $("email").value.trim());
+    fd.append("Paquete", p.nombre + " - " + bs(p.precio));
+    fd.append("Fecha y hora", fmtFecha($("fecha").value) + " " + $("hora").value);
+    fd.append("attachment", pdf.blob, pdf.name);
+    return fetch(ENVIO_URL, { method: "POST", headers: { Accept: "application/json" }, body: fd })
+      .then(function (r) { return r.json().catch(function () { return {}; }).then(function (d) {
+        if (!r.ok || d.success === "false" || d.success === false) throw new Error("envio");
+      }); });
   }
 
   $("f").addEventListener("submit", function (e) {
@@ -387,8 +409,13 @@
     }
     if (!window.jspdf) { m.textContent = "No se pudo cargar el generador de PDF. Revisa tu conexión e intenta de nuevo."; return; }
     Promise.all([cargarFirmaEstudio(), cargarLogo()]).then(function (r) {
-      try { generarPDF(r[0], r[1]); m.className = "msg ok"; m.textContent = "Contrato firmado. Tu PDF se descargó."; }
-      catch (err) { m.textContent = "Error al generar el PDF. Intenta de nuevo."; }
+      var pdf;
+      try { pdf = generarPDF(r[0], r[1]); }
+      catch (err) { m.textContent = "Error al generar el PDF. Intenta de nuevo."; return; }
+      m.className = "msg ok"; m.textContent = "Tu PDF se descargó. Enviando el contrato firmado a Camote Weddings…";
+      enviarContrato(pdf)
+        .then(function () { m.textContent = "Contrato firmado. Tu PDF se descargó y Camote Weddings ya recibió su copia."; })
+        .catch(function () { m.className = "msg"; m.textContent = "Tu PDF se descargó, pero no se pudo enviar la copia a Camote Weddings. Envíalo por WhatsApp al estudio."; });
     });
   });
 })();
