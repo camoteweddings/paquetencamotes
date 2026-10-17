@@ -9,7 +9,8 @@ ALLOWED_ORIGIN = "https://camoteweddings.com"
 # y pegar aquí el id que devuelve:
 [[kv_namespaces]]
 binding = "CONTRATOS"
-id = "PEGAR_ID_DEL_KV_AQUI"
+id = "a803d4a05aad4fab9f82c18ac941df15"
 
 # La clave de administrador NO va en este archivo. Se configura con:
 #   npx wrangler secret put ADMIN_KEY
+preview_urls = false
