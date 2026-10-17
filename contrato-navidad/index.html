@@ -376,7 +376,7 @@
   }
 
   // Envío automático del contrato firmado a Camote Weddings (FormSubmit).
-  var ENVIO_URL = "https://formsubmit.co/ajax/camoteweddings@gmail.com";
+  var ENVIO_URL = "https://formsubmit.co/camoteweddings@gmail.com"; // endpoint de formulario (el /ajax no adjunta archivos)
   function enviarContrato(pdf) {
     var p = pkg(), fd = new FormData();
     fd.append("_subject", "Contrato firmado: " + $("nombre").value.trim() + " — " + p.nombre);
@@ -389,10 +389,8 @@
     fd.append("Paquete", p.nombre + " - " + bs(p.precio));
     fd.append("Fecha y hora", fmtFecha($("fecha").value) + " " + $("hora").value);
     fd.append("attachment", pdf.blob, pdf.name);
-    return fetch(ENVIO_URL, { method: "POST", headers: { Accept: "application/json" }, body: fd })
-      .then(function (r) { return r.json().catch(function () { return {}; }).then(function (d) {
-        if (!r.ok || d.success === "false" || d.success === false) throw new Error("envio");
-      }); });
+    // POST multipart como un formulario normal; la respuesta es opaca (no-cors) pero el adjunto sí viaja.
+    return fetch(ENVIO_URL, { method: "POST", mode: "no-cors", body: fd });
   }
 
   $("f").addEventListener("submit", function (e) {
