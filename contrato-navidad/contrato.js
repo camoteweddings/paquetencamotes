@@ -1,7 +1,7 @@
 // Lógica compartida del contrato de Navidad (cliente y administrador).
 window.Contrato = (function () {
   // URL del Worker "camote-contratos" (se obtiene al publicarlo con wrangler).
-  var API = "https://camote-contratos.victorhugo9719.workers.dev";
+  var API = "https://camote-contratos.REEMPLAZAR.workers.dev";
   var STUDIO = "Camote Weddings";
   var LOGO_URL = "https://res.cloudinary.com/rauzqcoj/image/upload/f_auto,q_auto,w_400/LOGO_CAMOTE-06";
   var FIRMA_ESTUDIO = "/contrato-navidad/firma-victor.png";
