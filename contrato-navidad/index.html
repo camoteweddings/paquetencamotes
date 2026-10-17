@@ -7,7 +7,7 @@
 <meta name="robots" content="noindex, nofollow">
 <link rel="icon" href="/favicon.ico">
 <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Playfair+Display:wght@600;700;800&family=Work+Sans:wght@400;500;600&display=swap">
-<script src="contrato.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
 <style>
   :root { --night:#1B120C; --maroon:#7A2020; --gold:#C9A24B; --cream:#FAF8F3; --line:#E3DDCE; --ink:#4A4F4B; --muted:#6B7068; }
   * { box-sizing: border-box; }
@@ -99,17 +99,6 @@
   @keyframes bulb { 0%,100% { opacity:.95; } 50% { opacity:.35; } }
   #snow { position:fixed; inset:0; width:100%; height:100%; pointer-events:none; z-index:50; }
   header, main, footer { position:relative; z-index:1; }
-  /* Protección de la vista previa (disuasiva) */
-  .doc { background:#FFFDF8; border-radius:10px; padding:22px 20px; box-shadow:0 8px 24px rgba(0,0,0,.35); position:relative; overflow:hidden; -webkit-user-select:none; user-select:none; -webkit-touch-callout:none; transition:filter .15s; }
-  .doc.hide { filter:blur(22px); }
-  .doc h2 { font-family:'Playfair Display',Georgia,serif; color:var(--night); font-size:18px; margin:0 0 12px; }
-  .doc dl { margin:0 0 14px; display:grid; grid-template-columns:auto 1fr; gap:4px 12px; font-size:14px; }
-  .doc dt { font-weight:600; color:var(--night); } .doc dd { margin:0; }
-  .doc h3 { margin:14px 0 4px; font-size:14px; color:var(--night); } .doc p { margin:0 0 8px; font-size:14px; }
-  .wm { position:absolute; inset:0; pointer-events:none; opacity:.13; }
-  .state { text-align:center; color:#FAF8F3; padding:40px 10px; }
-  .done { background:#FFFDF8; border-radius:10px; padding:22px; text-align:center; color:var(--night); }
-  @media print { body * { display:none !important; } body::before { content:"Documento protegido. No se permite imprimir."; display:block; color:#000; padding:40px; } }
 </style>
 </head>
 <body>
@@ -122,7 +111,55 @@
 <main>
   <div class="garland"></div>
   <h1>🎄 Contrato de Sesión de Navidad</h1>
-  <div id="app"><div class="state">Cargando contrato…</div></div>
+  <p class="sub">Completa tus datos, lee el contrato, firma con el dedo o el mouse y descarga tu copia en PDF.</p>
+
+  <form id="f" autocomplete="off" novalidate>
+    <fieldset>
+      <legend>Datos del cliente</legend>
+      <div class="grid">
+        <label>Nombre completo<input id="nombre" required></label>
+        <label>Carnet de identidad (CI)<input id="ci" required></label>
+        <label>Teléfono / WhatsApp<input id="tel" inputmode="tel" required></label>
+        <label>Correo electrónico<input id="email" type="email" required></label>
+      </div>
+    </fieldset>
+
+    <fieldset>
+      <legend>Paquete y sesión</legend>
+      <div class="grid">
+        <label>Paquete
+          <select id="paquete">
+            <option value="Mini Sesión|250|30 minutos de sesión + 8 fotos digitales editadas + galería en línea">Mini Sesión — Bs.250</option>
+            <option value="Sesión Extendida|500|45 minutos de sesión + 15 fotos digitales editadas + 15 fotos impresas 10x15 + galería en línea">Sesión Extendida — Bs.500</option>
+          </select>
+        </label>
+        <label>Fecha de la sesión<input id="fecha" type="date" required></label>
+        <label>Hora<input id="hora" type="time" required></label>
+      </div>
+      <div class="summary" id="resumen"></div>
+    </fieldset>
+
+    <fieldset>
+      <legend>Términos del contrato</legend>
+      <div class="terms" id="terms"></div>
+      <label class="check"><input type="checkbox" id="acepto"> He leído y acepto los términos del contrato.</label>
+    </fieldset>
+
+    <fieldset>
+      <legend>Firma del cliente</legend>
+      <div class="sig-wrap">
+        <canvas id="sig"></canvas>
+        <div class="sig-hint" id="hint">Firma aquí</div>
+      </div>
+      <div class="sig-actions">
+        <span id="sigstate" style="color:var(--muted)">Sin firma</span>
+        <button type="button" class="linkbtn" id="clear">Borrar firma</button>
+      </div>
+    </fieldset>
+
+    <button class="btn off" id="go" type="submit">Firmar y descargar PDF</button>
+    <div class="msg" id="msg"></div>
+  </form>
 </main>
 <footer><span>✦ ✦ ✦</span><br>¡Felices fiestas! — Camote Weddings</footer>
 <div id="tree" aria-hidden="true"></div>
@@ -130,100 +167,230 @@
 
 <script>
 (function () {
-  var C = window.Contrato, $ = function (id) { return document.getElementById(id); };
-  var app = $("app"), id = new URLSearchParams(location.search).get("c");
-  var cv, ctx, signed = false, drawing = false, data;
+  var STUDIO = "Camote Weddings";
+  var $ = function (id) { return document.getElementById(id); };
 
-  function estado(msg) { app.innerHTML = '<div class="state">' + msg + "</div>"; }
-  if (!C.configurado()) return estado("Servicio no configurado.");
-  if (!id) return estado("Este enlace no es válido. Solicita tu enlace de contrato a Camote Weddings.");
+  var CLAUSULAS = [
+    ["1. Objeto", "Camote Weddings (el «Estudio») prestará al cliente el servicio de sesión fotográfica de Navidad en estudio, según el paquete, fecha y hora indicados en este contrato."],
+    ["2. Contenido del paquete", "El paquete contratado incluye lo descrito en el resumen anterior. Cualquier extra (impresiones adicionales, ampliaciones en MDF) se cotiza y acuerda por separado."],
+    ["3. Precio y forma de pago", "El valor del paquete es el indicado. La fecha se aparta con el 70% del valor del paquete; el 30% restante se paga el día de la sesión."],
+    ["4. Entrega", "El Estudio entregará las fotos digitales editadas mediante galería en línea y las fotos impresas (si el paquete las incluye) en una fecha coordinada a tiempo para la Navidad, según la fecha de la sesión."],
+    ["5. Puntualidad", "La sesión se realiza en el horario reservado. El retraso del cliente reduce el tiempo de sesión sin extender el horario ni modificar el precio."],
+    ["6. Reprogramación", "El cliente puede solicitar el cambio de fecha con anticipación, sujeto a disponibilidad de cupos del Estudio."],
+    ["7. Uso de imágenes", "Las fotografías son obra del Estudio, que cede al cliente su uso personal. El cliente autoriza al Estudio a usar las imágenes con fines de portafolio y promoción, salvo que lo indique expresamente por escrito."],
+    ["8. Aceptación", "Ambas partes aceptan este contrato con la firma del cliente. El presente documento se genera en formato digital y tiene validez como constancia de aceptación."]
+  ];
 
-  C.api("/c/" + encodeURIComponent(id)).then(render).catch(function (e) {
-    estado(e.status === 404 ? "Este contrato no existe o el enlace ya no es válido." : "No se pudo cargar el contrato. Intenta de nuevo.");
+  // Términos en pantalla
+  $("terms").innerHTML = CLAUSULAS.map(function (c) {
+    return "<h3>" + c[0] + "</h3><p>" + c[1] + "</p>";
+  }).join("");
+
+  function pkg() {
+    var p = $("paquete").value.split("|");
+    var precio = Number(p[1]);
+    return { nombre: p[0], precio: precio, anticipo: precio * 0.7, resto: precio * 0.3, incluye: p[2] };
+  }
+  function bs(n) { return "Bs." + (Math.round(n * 100) / 100).toString().replace(/\.0+$/, ""); }
+  function fmtFecha(v) {
+    if (!v) return "";
+    var d = v.split("-");
+    return d[2] + "/" + d[1] + "/" + d[0];
+  }
+  function resumen() {
+    var p = pkg();
+    $("resumen").innerHTML = "<strong>" + p.nombre + "</strong> — " + bs(p.precio) + "<br>" + p.incluye +
+      "<br>Reserva (70%): <strong>" + bs(p.anticipo) + "</strong> · Día de la sesión (30%): <strong>" + bs(p.resto) + "</strong>";
+  }
+  $("paquete").addEventListener("change", resumen);
+  resumen();
+
+  // Firma
+  var cv = $("sig"), ctx, signed = false, drawing = false;
+  function setup() {
+    var r = cv.getBoundingClientRect(), dpr = window.devicePixelRatio || 1;
+    var keep = signed ? cv.toDataURL() : null;
+    cv.width = Math.round(r.width * dpr);
+    cv.height = Math.round(r.height * dpr);
+    ctx = cv.getContext("2d");
+    ctx.scale(dpr, dpr);
+    ctx.lineWidth = 2.2; ctx.lineCap = "round"; ctx.lineJoin = "round"; ctx.strokeStyle = "#1B120C";
+    if (keep) { var im = new Image(); im.onload = function () { ctx.drawImage(im, 0, 0, r.width, r.height); }; im.src = keep; }
+  }
+  function pos(e) { var r = cv.getBoundingClientRect(); return { x: e.clientX - r.left, y: e.clientY - r.top }; }
+  cv.addEventListener("pointerdown", function (e) {
+    drawing = true; cv.setPointerCapture(e.pointerId);
+    var p = pos(e); ctx.beginPath(); ctx.moveTo(p.x, p.y); ctx.lineTo(p.x + 0.1, p.y + 0.1); ctx.stroke();
+    mark();
+  });
+  cv.addEventListener("pointermove", function (e) {
+    if (!drawing) return;
+    var p = pos(e); ctx.lineTo(p.x, p.y); ctx.stroke();
+  });
+  ["pointerup", "pointercancel", "pointerleave"].forEach(function (t) {
+    cv.addEventListener(t, function () { drawing = false; });
+  });
+  function mark() {
+    if (!signed) { signed = true; $("hint").style.display = "none"; $("sigstate").textContent = "Firma registrada"; validar(); }
+  }
+  $("clear").addEventListener("click", function () {
+    ctx.clearRect(0, 0, cv.width, cv.height);
+    signed = false; $("hint").style.display = ""; $("sigstate").textContent = "Sin firma"; validar();
+  });
+  window.addEventListener("resize", setup);
+  setup();
+
+  // Validación: el PDF solo se habilita con firma + datos + aceptación
+  function validar() {
+    var ok = signed && $("acepto").checked &&
+      ["nombre", "ci", "tel", "email", "fecha", "hora"].every(function (id) { return $(id).value.trim() && $(id).checkValidity(); });
+    $("go").classList.toggle("off", !ok);
+    return ok;
+  }
+  ["nombre", "ci", "tel", "email", "fecha", "hora", "acepto"].forEach(function (id) {
+    $(id).addEventListener("input", function () { $(id).classList.remove("err"); });
+    $(id).addEventListener("input", validar);
+    $(id).addEventListener("change", validar);
   });
 
-  function render(c) {
-    data = c;
-    var ant = c.precio * 0.7, resto = c.precio * 0.3;
-    var ci = c.ci.length > 4 ? c.ci.slice(0, -4).replace(/./g, "•") + c.ci.slice(-4) : c.ci;
-    var wmText = C.esc(c.nombre) + " · " + new Date().toLocaleDateString("es-BO") + " · PREVISUALIZACIÓN";
-    var wm = "<svg xmlns='http://www.w3.org/2000/svg' width='320' height='170'><text x='10' y='100' transform='rotate(-24 160 85)' font-family='sans-serif' font-size='15' font-weight='700' fill='#1B120C'>" + wmText + "</text></svg>";
-    var h = '<div class="doc" id="doc"><h2>CONTRATO DE SESIÓN FOTOGRÁFICA DE NAVIDAD</h2>' +
-      "<p>Entre " + C.STUDIO + " (el «Estudio») y el cliente identificado a continuación, se acuerda lo siguiente:</p><dl>" +
-      "<dt>Cliente</dt><dd>" + C.esc(c.nombre) + "</dd><dt>CI</dt><dd>" + C.esc(ci) + "</dd>" +
-      "<dt>Teléfono</dt><dd>" + C.esc(c.tel) + "</dd><dt>Correo</dt><dd>" + C.esc(c.email) + "</dd>" +
-      "<dt>Paquete</dt><dd>" + C.esc(c.paquete) + " — " + C.bs(c.precio) + "</dd><dt>Incluye</dt><dd>" + C.esc(c.incluye) + "</dd>" +
-      "<dt>Fecha y hora</dt><dd>" + C.fmtFecha(c.fecha) + " a las " + C.esc(c.hora) + "</dd>" +
-      "<dt>Reserva (70%)</dt><dd>" + C.bs(ant) + "</dd><dt>Día de la sesión (30%)</dt><dd>" + C.bs(resto) + "</dd></dl>" +
-      C.CLAUSULAS.map(function (x) { return "<h3>" + x[0] + "</h3><p>" + x[1] + "</p>"; }).join("") +
-      '<div class="wm" style="background:url(\'data:image/svg+xml;utf8,' + encodeURIComponent(wm) + '\')"></div></div>';
+  var FIRMA_ESTUDIO = "firma-victor.png";
+  function cargarFirmaEstudio() {
+    return new Promise(function (res) {
+      var im = new Image();
+      im.onload = function () {
+        var c = document.createElement("canvas"); c.width = im.naturalWidth; c.height = im.naturalHeight;
+        c.getContext("2d").drawImage(im, 0, 0);
+        res({ data: c.toDataURL("image/png"), w: c.width, h: c.height });
+      };
+      im.onerror = function () { res(null); };
+      im.src = FIRMA_ESTUDIO + "?v=" + Date.now();
+    });
+  }
 
-    if (c.firmado) {
-      app.innerHTML = h + '<div class="done" style="margin-top:18px"><strong>✅ Este contrato ya fue firmado.</strong><br>Camote Weddings conserva el original.</div>';
-    } else {
-      app.innerHTML = '<p class="sub">Lee el contrato, acepta los términos y firma con el dedo o el mouse. Camote Weddings conservará el original firmado.</p>' + h +
-        '<form id="f" style="margin-top:20px" novalidate><fieldset><legend>Confirmación</legend>' +
-        '<label class="check" style="margin-top:0"><input type="checkbox" id="acepto"> He leído y acepto los términos del contrato.</label></fieldset>' +
-        '<fieldset><legend>Firma del cliente</legend><div class="sig-wrap"><canvas id="sig"></canvas><div class="sig-hint" id="hint">Firma aquí</div></div>' +
-        '<div class="sig-actions"><span id="sigstate" style="color:var(--muted)">Sin firma</span><button type="button" class="linkbtn" id="clear">Borrar firma</button></div></fieldset>' +
-        '<button class="btn off" id="go" type="submit">Firmar contrato</button><div class="msg" id="msg"></div></form>';
-      initFirma();
+  var LOGO_URL = "https://res.cloudinary.com/rauzqcoj/image/upload/f_auto,q_auto,w_400/LOGO_CAMOTE-06";
+  function cargarLogo() {
+    return new Promise(function (res) {
+      var im = new Image(); im.crossOrigin = "anonymous";
+      im.onload = function () {
+        try {
+          var c = document.createElement("canvas"); c.width = im.naturalWidth; c.height = im.naturalHeight;
+          var x = c.getContext("2d"); x.drawImage(im, 0, 0);
+          var d = x.getImageData(0, 0, c.width, c.height), a = d.data;
+          for (var i = 0; i < a.length; i += 4) { a[i] = 255; a[i + 1] = 255; a[i + 2] = 255; }
+          x.putImageData(d, 0, 0);
+          res({ data: c.toDataURL("image/png"), w: c.width, h: c.height });
+        } catch (e) { res(null); }
+      };
+      im.onerror = function () { res(null); };
+      im.src = LOGO_URL;
+    });
+  }
+
+  function generarPDF(firmaEst, logo) {
+    var jsPDF = window.jspdf.jsPDF;
+    var doc = new jsPDF({ unit: "mm", format: "a4" });
+    var W = 210, M = 20, CW = W - 2 * M, y = 0;
+    var p = pkg();
+    var ahora = new Date();
+    var fechaFirma = ahora.toLocaleDateString("es-BO", { day: "2-digit", month: "long", year: "numeric" });
+
+    function need(h) { if (y + h > 280) { doc.addPage(); y = 22; } }
+    function para(txt, size, style, gap) {
+      doc.setFont("helvetica", style || "normal"); doc.setFontSize(size || 10.5);
+      var lines = doc.splitTextToSize(txt, CW);
+      lines.forEach(function (l) { need(6); doc.text(l, M, y); y += (size || 10.5) * 0.46; });
+      y += gap == null ? 2.5 : gap;
     }
-    protect();
-  }
 
-  function initFirma() {
-    cv = $("sig");
-    function setup() {
-      var r = cv.getBoundingClientRect(), dpr = window.devicePixelRatio || 1, keep = signed ? cv.toDataURL() : null;
-      cv.width = Math.round(r.width * dpr); cv.height = Math.round(r.height * dpr);
-      ctx = cv.getContext("2d"); ctx.scale(dpr, dpr);
-      ctx.lineWidth = 2.2; ctx.lineCap = "round"; ctx.lineJoin = "round"; ctx.strokeStyle = "#1B120C";
-      if (keep) { var im = new Image(); im.onload = function () { ctx.drawImage(im, 0, 0, r.width, r.height); }; im.src = keep; }
+    // Encabezado
+    doc.setFillColor(27, 18, 12); doc.rect(0, 0, W, 26, "F");
+    doc.setTextColor(250, 248, 243); doc.setFont("helvetica", "bold"); doc.setFontSize(16);
+    if (logo) { var lh = 14, lw = lh * (logo.w / logo.h); doc.addImage(logo.data, "PNG", M, 6, lw, lh); }
+    else doc.text(STUDIO, M, 16);
+    doc.setFont("helvetica", "normal"); doc.setFontSize(9);
+    doc.text("camoteweddings.com", W - M, 16, { align: "right" });
+    doc.setTextColor(27, 18, 12);
+    y = 40;
+    doc.setFont("helvetica", "bold"); doc.setFontSize(15);
+    doc.text("CONTRATO DE SESIÓN FOTOGRÁFICA DE NAVIDAD", M, y); y += 10;
+
+    para("Entre " + STUDIO + " (el «Estudio») y el cliente identificado a continuación, se acuerda lo siguiente:", 10.5, "normal", 4);
+
+    // Datos
+    var filas = [
+      ["Cliente", $("nombre").value.trim()],
+      ["CI", $("ci").value.trim()],
+      ["Teléfono", $("tel").value.trim()]
+    ];
+    filas.push(["Correo", $("email").value.trim()]);
+    filas.push(["Paquete", p.nombre + " — " + bs(p.precio)]);
+    filas.push(["Incluye", p.incluye]);
+    filas.push(["Fecha y hora", fmtFecha($("fecha").value) + " a las " + $("hora").value]);
+    filas.push(["Reserva (70%)", bs(p.anticipo)]);
+    filas.push(["Día de la sesión (30%)", bs(p.resto)]);
+    filas.forEach(function (r) {
+      doc.setFont("helvetica", "bold"); doc.setFontSize(10.5);
+      var lines = doc.splitTextToSize(r[1], CW - 52);
+      need(lines.length * 5 + 3);
+      doc.text(r[0] + ":", M, y);
+      doc.setFont("helvetica", "normal");
+      doc.text(lines, M + 52, y);
+      y += lines.length * 5 + 1.5;
+    });
+    y += 4;
+    doc.setDrawColor(201, 162, 75); doc.line(M, y, W - M, y); y += 8;
+
+    // Cláusulas
+    CLAUSULAS.forEach(function (c) {
+      need(18);
+      para(c[0], 11, "bold", 1);
+      para(c[1], 10.5, "normal", 4);
+    });
+
+    // Firmas
+    need(70); y += 6;
+    var img = cv.toDataURL("image/png");
+    var sw = 70, sh = sw * (cv.height / cv.width);
+    if (sh > 32) { sh = 32; sw = sh * (cv.width / cv.height); }
+    doc.addImage(img, "PNG", M, y, sw, sh);
+    if (firmaEst) {
+      var ew = 70, eh = ew * (firmaEst.h / firmaEst.w);
+      if (eh > 32) { eh = 32; ew = eh * (firmaEst.w / firmaEst.h); }
+      doc.addImage(firmaEst.data, "PNG", W - M - 75, y, ew, eh);
     }
-    function pos(e) { var r = cv.getBoundingClientRect(); return { x: e.clientX - r.left, y: e.clientY - r.top }; }
-    cv.addEventListener("pointerdown", function (e) {
-      drawing = true; cv.setPointerCapture(e.pointerId);
-      var p = pos(e); ctx.beginPath(); ctx.moveTo(p.x, p.y); ctx.lineTo(p.x + 0.1, p.y + 0.1); ctx.stroke();
-      if (!signed) { signed = true; $("hint").style.display = "none"; $("sigstate").textContent = "Firma registrada"; validar(); }
-    });
-    cv.addEventListener("pointermove", function (e) { if (drawing) { var p = pos(e); ctx.lineTo(p.x, p.y); ctx.stroke(); } });
-    ["pointerup", "pointercancel", "pointerleave"].forEach(function (t) { cv.addEventListener(t, function () { drawing = false; }); });
-    $("clear").addEventListener("click", function () {
-      ctx.clearRect(0, 0, cv.width, cv.height); signed = false; $("hint").style.display = ""; $("sigstate").textContent = "Sin firma"; validar();
-    });
-    window.addEventListener("resize", setup); setup();
-    $("acepto").addEventListener("change", validar);
-    $("f").addEventListener("submit", function (e) {
-      e.preventDefault();
-      var m = $("msg"); m.className = "msg";
-      if (!validar()) { m.textContent = !$("acepto").checked ? "Debes aceptar los términos del contrato." : "Falta la firma del cliente."; return; }
-      $("go").classList.add("off"); m.textContent = "Enviando…";
-      C.api("/c/" + encodeURIComponent(id) + "/sign", { method: "POST", body: { firma: cv.toDataURL("image/png") } })
-        .then(function () { app.querySelector("form").outerHTML = '<div class="done" style="margin-top:18px"><strong>✅ Contrato firmado.</strong><br>Gracias, ' + C.esc(data.nombre) + '. Camote Weddings recibió tu firma.</div>'; })
-        .catch(function (er) { $("go").classList.remove("off"); m.textContent = er.status === 409 ? "Este contrato ya fue firmado." : "No se pudo enviar la firma. Intenta de nuevo."; });
-    });
-  }
-  function validar() { var ok = signed && $("acepto").checked; $("go").classList.toggle("off", !ok); return ok; }
+    var ly = y + 34;
+    doc.setDrawColor(27, 18, 12); doc.line(M, ly, M + 75, ly); doc.line(W - M - 75, ly, W - M, ly);
+    doc.setFont("helvetica", "bold"); doc.setFontSize(10);
+    doc.text($("nombre").value.trim(), M, ly + 5);
+    doc.text("Victor Villarroel", W - M - 75, ly + 5);
+    doc.setFont("helvetica", "normal"); doc.setFontSize(9);
+    doc.text("Cliente — CI " + $("ci").value.trim(), M, ly + 10);
+    doc.text("Representante — " + STUDIO, W - M - 75, ly + 10);
+    doc.setFontSize(8.5); doc.setTextColor(107, 112, 104);
+    doc.text("Firmado digitalmente el " + fechaFirma + " a las " + ahora.toLocaleTimeString("es-BO", { hour: "2-digit", minute: "2-digit" }), M, ly + 20);
 
-  // Disuasión de copia/captura (no es infalible: no existe forma de bloquear capturas del sistema operativo).
-  function protect() {
-    var doc = $("doc"), tmr;
-    function ocultar(ms) { doc.classList.add("hide"); clearTimeout(tmr); tmr = 0; if (ms) tmr = setTimeout(mostrar, ms); }
-    function mostrar() { tmr = 0; if (!document.hidden) doc.classList.remove("hide"); }
-    ["contextmenu", "copy", "cut", "dragstart", "selectstart"].forEach(function (t) { document.addEventListener(t, function (e) { e.preventDefault(); }); });
-    document.addEventListener("keydown", function (e) {
-      var k = (e.key || "").toLowerCase(), mod = e.ctrlKey || e.metaKey;
-      if (k === "printscreen" || (mod && ["p", "s", "c", "u"].indexOf(k) > -1) || (e.metaKey && e.shiftKey && ["3", "4", "5"].indexOf(k) > -1) || (e.ctrlKey && e.shiftKey && k === "s")) {
-        e.preventDefault(); ocultar(1800);
-        try { navigator.clipboard.writeText(" "); } catch (x) {}
-      }
-    });
-    window.addEventListener("blur", function () { ocultar(0); });
-    window.addEventListener("focus", mostrar);
-    document.addEventListener("visibilitychange", function () { document.hidden ? ocultar(0) : mostrar(); });
-    ["pointerdown", "touchstart", "scroll"].forEach(function (t) { window.addEventListener(t, function () { if (!tmr) mostrar(); }, { passive: true }); });
+    var slug = $("nombre").value.trim().toLowerCase().normalize("NFD").replace(/[̀-ͯ]/g, "").replace(/[^a-z0-9]+/g, "-").replace(/^-|-$/g, "");
+    doc.save("contrato-navidad-" + (slug || "cliente") + ".pdf");
   }
+
+  $("f").addEventListener("submit", function (e) {
+    e.preventDefault();
+    var m = $("msg"); m.className = "msg";
+    if (!validar()) {
+      var falt = false;
+      ["nombre", "ci", "tel", "email", "fecha", "hora"].forEach(function (id) {
+        var bad = !$(id).value.trim() || !$(id).checkValidity();
+        $(id).classList.toggle("err", bad); falt = falt || bad;
+      });
+      m.textContent = falt ? "Completa todos los campos obligatorios marcados en rojo." : (!$("acepto").checked ? "Debes aceptar los términos del contrato." : "Falta la firma del cliente.");
+      return;
+    }
+    if (!window.jspdf) { m.textContent = "No se pudo cargar el generador de PDF. Revisa tu conexión e intenta de nuevo."; return; }
+    Promise.all([cargarFirmaEstudio(), cargarLogo()]).then(function (r) {
+      try { generarPDF(r[0], r[1]); m.className = "msg ok"; m.textContent = "Contrato firmado. Tu PDF se descargó."; }
+      catch (err) { m.textContent = "Error al generar el PDF. Intenta de nuevo."; }
+    });
+  });
 })();
 
 // Árbol de fondo
