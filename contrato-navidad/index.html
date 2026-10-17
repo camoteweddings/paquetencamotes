@@ -288,7 +288,7 @@
 
   function generarPDF(firmaEst, logo) {
     var jsPDF = window.jspdf.jsPDF;
-    var doc = new jsPDF({ unit: "mm", format: "a4" });
+    var doc = new jsPDF({ unit: "mm", format: "a4", compress: true });
     var W = 210, M = 20, CW = W - 2 * M, y = 0;
     var p = pkg();
     var ahora = new Date();
@@ -305,7 +305,7 @@
     // Encabezado
     doc.setFillColor(27, 18, 12); doc.rect(0, 0, W, 26, "F");
     doc.setTextColor(250, 248, 243); doc.setFont("helvetica", "bold"); doc.setFontSize(16);
-    if (logo) { var lh = 14, lw = lh * (logo.w / logo.h); doc.addImage(logo.data, "PNG", M, 6, lw, lh); }
+    if (logo) { var lh = 14, lw = lh * (logo.w / logo.h); doc.addImage(logo.data, "PNG", M, 6, lw, lh, undefined, "FAST"); }
     else doc.text(STUDIO, M, 16);
     doc.setFont("helvetica", "normal"); doc.setFontSize(9);
     doc.text("camoteweddings.com", W - M, 16, { align: "right" });
@@ -352,11 +352,11 @@
     var img = cv.toDataURL("image/png");
     var sw = 70, sh = sw * (cv.height / cv.width);
     if (sh > 32) { sh = 32; sw = sh * (cv.width / cv.height); }
-    doc.addImage(img, "PNG", M, y, sw, sh);
+    doc.addImage(img, "PNG", M, y, sw, sh, undefined, "FAST");
     if (firmaEst) {
       var ew = 70, eh = ew * (firmaEst.h / firmaEst.w);
       if (eh > 32) { eh = 32; ew = eh * (firmaEst.w / firmaEst.h); }
-      doc.addImage(firmaEst.data, "PNG", W - M - 75, y, ew, eh);
+      doc.addImage(firmaEst.data, "PNG", W - M - 75, y, ew, eh, undefined, "FAST");
     }
     var ly = y + 34;
     doc.setDrawColor(27, 18, 12); doc.line(M, ly, M + 75, ly); doc.line(W - M - 75, ly, W - M, ly);
