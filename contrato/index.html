@@ -1,0 +1,268 @@
+<!doctype html>
+<html lang="es">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Firmar contrato | Camote Weddings</title>
+<meta name="robots" content="noindex, nofollow, noarchive">
+<link rel="icon" href="/favicon.ico">
+<link rel="stylesheet" href="assets/estilo.css">
+</head>
+<body>
+<header class="top"><img src="assets/logo.png" alt="Camote Weddings"></header>
+<main>
+  <div id="estado" class="msg info show">Verificando tu contrato…</div>
+
+  <div id="firmar" class="hidden">
+    <span class="eyebrow">Contrato de servicios</span>
+    <h1>Lee y firma tu contrato</h1>
+    <p class="sub">Revisa el contrato, acepta, escribe tu nombre y firma con el dedo. Al terminar se descarga tu copia en PDF.</p>
+
+    <div class="paper" id="paper"></div>
+
+    <fieldset>
+      <legend>Tu firma</legend>
+      <label class="check"><input type="checkbox" id="acepto"> <span>He leído y acepto el contrato.</span></label>
+      <label style="margin-top:14px;">Escribe tu nombre completo<input id="nombre" autocomplete="name" maxlength="80"></label>
+      <div style="margin-top:14px;" class="sig-wrap">
+        <canvas id="sig"></canvas>
+        <div class="sig-hint" id="hint">Firma aquí</div>
+      </div>
+      <div class="sig-actions">
+        <span id="sigstate">Sin firma</span>
+        <button type="button" class="linkbtn" id="clear">Borrar y repetir</button>
+      </div>
+    </fieldset>
+
+    <button class="btn" id="go" type="button" disabled>Descargar y enviar</button>
+    <div class="msg" id="msg"></div>
+  </div>
+</main>
+<footer>Camote Weddings · Santa Cruz de la Sierra, Bolivia</footer>
+
+<script src="assets/config.js"></script>
+<script src="assets/jspdf.umd.min.js"></script>
+<script src="assets/contrato.js"></script>
+<script>
+(function () {
+  var $ = function (id) { return document.getElementById(id); };
+  var C = window.CW_CONFIG, K = window.CW_CONTRATO;
+  var DEMO = !C.SCRIPT_URL && /^(localhost|127\.0\.0\.1)$/.test(location.hostname);
+  var token = (location.hash || "").replace(/^#/, "");
+  var datos = null, pdfBlob = null, pdfB64 = null, huella = null, firmadoEn = null, yaDescargado = false, enviando = false;
+
+  function estado(txt, cls) {
+    var e = $("estado"); e.textContent = txt; e.className = "msg show " + (cls || "info");
+    $("firmar").classList.add("hidden");
+  }
+  function msg(txt, cls) { var m = $("msg"); m.textContent = txt; m.className = "msg show " + cls; }
+
+  function decodePayload(p) {
+    var s = p.replace(/-/g, "+").replace(/_/g, "/"); while (s.length % 4) s += "=";
+    var bin = atob(s), bytes = new Uint8Array(bin.length);
+    for (var i = 0; i < bin.length; i++) bytes[i] = bin.charCodeAt(i);
+    return JSON.parse(new TextDecoder().decode(bytes));
+  }
+  function esc(s) { return String(s).replace(/[&<>"']/g, function (c) { return { "&": "&amp;", "<": "&lt;", ">": "&gt;", '"': "&quot;", "'": "&#39;" }[c]; }); }
+
+  function ahoraLaPaz() {
+    var d = new Date();
+    var f = new Intl.DateTimeFormat("es-BO", { timeZone: "America/La_Paz", day: "numeric", month: "long", year: "numeric" }).format(d);
+    var h = new Intl.DateTimeFormat("es-BO", { timeZone: "America/La_Paz", hour: "2-digit", minute: "2-digit", second: "2-digit", hour12: false }).format(d);
+    return { fecha: f, hora: h, iso: d.toISOString() };
+  }
+
+  // ---------- Verificación del enlace ----------
+  function iniciar() {
+    if (!token || token.split(".").length !== 2) return estado("Este enlace no es válido. Pídele a Camote Weddings que te envíe uno nuevo.", "err");
+    try { datos = decodePayload(token.split(".")[0]); } catch (e) { return estado("Este enlace no es válido. Pídele a Camote Weddings que te envíe uno nuevo.", "err"); }
+    if (!datos || !datos.id || !datos.cliente) return estado("Este enlace no es válido.", "err");
+    if (datos.exp && Date.now() > datos.exp) return estado("Este enlace ya venció. Pídele a Camote Weddings uno nuevo.", "err");
+    try { if (localStorage.getItem("cw_firmado_" + datos.id)) return estado("Este contrato ya fue firmado. ¡Gracias!", "ok"); } catch (e) {}
+    if (DEMO) return mostrar();
+    if (!C.SCRIPT_URL) return estado("El sistema aún no está configurado. Avísale a Camote Weddings.", "err");
+    fetch(C.SCRIPT_URL + "?t=" + encodeURIComponent(token)).then(function (r) { return r.json(); }).then(function (j) {
+      if (j.ok && j.estado === "pendiente") return mostrar();
+      if (j.estado === "firmado") return estado("Este contrato ya fue firmado. ¡Gracias!", "ok");
+      if (j.error === "expirado") return estado("Este enlace ya venció. Pídele a Camote Weddings uno nuevo.", "err");
+      estado("Este enlace no es válido. Pídele a Camote Weddings que te envíe uno nuevo.", "err");
+    }).catch(function () {
+      estado("No pudimos verificar el contrato. Revisa tu conexión a internet y recarga la página.", "err");
+    });
+  }
+
+  function mostrar() {
+    var hoy = ahoraLaPaz();
+    var cl = K.clausulas(datos, "____ de ________ de 20__");
+    var html = "<h2>" + esc(K.titulo) + "</h2><p>" + esc(K.preambulo) + "</p>";
+    cl.forEach(function (c) { html += "<h3>" + esc(c.t) + "</h3><p>" + esc(c.p) + "</p>"; });
+    html += '<div class="sigs"><div class="box"><img src="assets/firma-victor.png" alt="Firma"><div class="line">Victor Hugo Villarroel Paredes<br>Representante, Equipo VICTORFRAME</div></div>' +
+            '<div class="box"><div style="height:64px"></div><div class="line">' + esc(datos.cliente) + "<br>Contratante</div></div></div>";
+    $("paper").innerHTML = html;
+    $("estado").className = "msg"; $("firmar").classList.remove("hidden");
+    setup(); validar();
+  }
+
+  // ---------- Firma en canvas ----------
+  var cv = $("sig"), ctx, signed = false, drawing = false;
+  function setup() {
+    var r = cv.getBoundingClientRect(), dpr = window.devicePixelRatio || 1;
+    var keep = signed ? cv.toDataURL() : null;
+    cv.width = Math.round(r.width * dpr); cv.height = Math.round(r.height * dpr);
+    ctx = cv.getContext("2d"); ctx.scale(dpr, dpr);
+    ctx.lineWidth = 2.4; ctx.lineCap = "round"; ctx.lineJoin = "round"; ctx.strokeStyle = "#1a1a2e";
+    if (keep) { var im = new Image(); im.onload = function () { ctx.drawImage(im, 0, 0, r.width, r.height); }; im.src = keep; }
+  }
+  function pos(e) { var r = cv.getBoundingClientRect(); return { x: e.clientX - r.left, y: e.clientY - r.top }; }
+  cv.addEventListener("pointerdown", function (e) {
+    e.preventDefault(); drawing = true; cv.setPointerCapture(e.pointerId);
+    var p = pos(e); ctx.beginPath(); ctx.moveTo(p.x, p.y); ctx.lineTo(p.x + 0.1, p.y + 0.1); ctx.stroke();
+    if (!signed) { signed = true; $("hint").style.display = "none"; $("sigstate").textContent = "Firma registrada"; validar(); }
+    resetEnvio();
+  });
+  cv.addEventListener("pointermove", function (e) { if (!drawing) return; var p = pos(e); ctx.lineTo(p.x, p.y); ctx.stroke(); });
+  ["pointerup", "pointercancel"].forEach(function (t) { cv.addEventListener(t, function () { drawing = false; }); });
+  $("clear").addEventListener("click", function () {
+    ctx.clearRect(0, 0, cv.width, cv.height); signed = false;
+    $("hint").style.display = ""; $("sigstate").textContent = "Sin firma"; validar(); resetEnvio();
+  });
+  window.addEventListener("resize", function () { if (!drawing && datos) setup(); });
+
+  function validar() {
+    var ok = signed && $("acepto").checked && $("nombre").value.trim().length >= 5;
+    $("go").disabled = !ok || enviando;
+  }
+  ["acepto", "nombre"].forEach(function (id) { $(id).addEventListener("input", function () { validar(); resetEnvio(); }); $(id).addEventListener("change", validar); });
+
+  // Si cambia la firma o el nombre tras un intento fallido, hay que generar otro PDF
+  function resetEnvio() {
+    if (pdfBlob && !enviando) { pdfBlob = null; pdfB64 = null; yaDescargado = false; $("go").textContent = "Descargar y enviar"; $("msg").className = "msg"; }
+  }
+
+  // ---------- PDF ----------
+  function sha256hex(str) {
+    return crypto.subtle.digest("SHA-256", new TextEncoder().encode(str)).then(function (b) {
+      return Array.prototype.map.call(new Uint8Array(b), function (x) { return ("0" + x.toString(16)).slice(-2); }).join("");
+    });
+  }
+  function cargarImg(src) {
+    return new Promise(function (res) {
+      var im = new Image();
+      im.onload = function () { var c = document.createElement("canvas"); c.width = im.naturalWidth; c.height = im.naturalHeight; c.getContext("2d").drawImage(im, 0, 0); res({ data: c.toDataURL("image/png"), w: c.width, h: c.height }); };
+      im.onerror = function () { res(null); }; im.src = src;
+    });
+  }
+
+  function generarPDF() {
+    var nombre = $("nombre").value.trim();
+    var t = ahoraLaPaz(); firmadoEn = t.iso;
+    var firmaCli = cv.toDataURL("image/png");
+    return Promise.all([cargarImg("assets/firma-victor.png"), cargarImg("assets/logo.png"),
+      sha256hex(token + "|" + nombre + "|" + t.iso + "|" + firmaCli)]).then(function (r) {
+      var firmaEst = r[0], logo = r[1]; huella = r[2];
+      var jsPDF = window.jspdf.jsPDF;
+      var doc = new jsPDF({ unit: "mm", format: "a4", compress: true });
+      var W = 210, M = 20, CW = W - 2 * M, y = 0;
+      function need(h) { if (y + h > 282) { doc.addPage(); y = 22; } }
+      function para(txt, size, style, gap, align) {
+        doc.setFont("helvetica", style || "normal"); doc.setFontSize(size || 10);
+        var lines = doc.splitTextToSize(txt, CW);
+        lines.forEach(function (l) { need(6); doc.text(l, M, y, align ? { align: align, maxWidth: CW } : undefined); y += (size || 10) * 0.45; });
+        y += gap == null ? 2.5 : gap;
+      }
+      // Encabezado
+      if (logo) { var lh = 22, lw = lh * logo.w / logo.h; doc.addImage(logo.data, "PNG", W / 2 - lw / 2, 8, lw, lh, undefined, "FAST"); }
+      y = 36;
+      doc.setTextColor(43, 36, 32); doc.setFont("helvetica", "bold"); doc.setFontSize(14);
+      doc.text(K.titulo.toUpperCase(), W / 2, y, { align: "center" }); y += 9;
+      para(K.preambulo, 9.5, "normal", 4);
+      K.clausulas(datos, t.fecha).forEach(function (c) {
+        need(16); para(c.t, 10, "bold", 1); para(c.p, 9.5, "normal", 3.5);
+      });
+      // Firmas
+      need(62); y += 6;
+      var ey = y;
+      if (firmaEst) { var ew = 58, eh = ew * firmaEst.h / firmaEst.w; if (eh > 26) { eh = 26; ew = eh * firmaEst.w / firmaEst.h; } doc.addImage(firmaEst.data, "PNG", M, ey, ew, eh); }
+      var cw_ = 58, ch = cw_ * cv.height / cv.width; if (ch > 26) { ch = 26; cw_ = ch * cv.width / cv.height; }
+      doc.addImage(firmaCli, "PNG", W - M - 75, ey, cw_, ch);
+      var ly = ey + 28;
+      doc.setDrawColor(43, 36, 32); doc.line(M, ly, M + 75, ly); doc.line(W - M - 75, ly, W - M, ly);
+      doc.setFont("helvetica", "bold"); doc.setFontSize(9);
+      doc.text("Victor Hugo Villarroel Paredes", M, ly + 5); doc.text(nombre, W - M - 75, ly + 5);
+      doc.setFont("helvetica", "normal"); doc.setFontSize(8.5);
+      doc.text("Representante - Equipo VICTORFRAME", M, ly + 9.5); doc.text("Contratante - C.I. " + datos.ci, W - M - 75, ly + 9.5);
+      y = ly + 20;
+      // Constancia digital
+      need(30);
+      doc.setFillColor(243, 233, 219); doc.rect(M, y, CW, 26, "F");
+      doc.setFont("helvetica", "bold"); doc.setFontSize(8.5); doc.setTextColor(43, 36, 32);
+      doc.text("CONSTANCIA DE FIRMA ELECTRÓNICA", M + 3, y + 5.5);
+      doc.setFont("helvetica", "normal"); doc.setFontSize(8);
+      doc.text("Firmado por: " + nombre + "   |   Fecha: " + t.fecha + "   |   Hora (Bolivia): " + t.hora, M + 3, y + 10.5);
+      doc.text("Contrato N.º: " + datos.id, M + 3, y + 15);
+      doc.text("Huella de verificación (SHA-256):", M + 3, y + 19.5);
+      doc.setFont("courier", "normal"); doc.setFontSize(7.2);
+      doc.text(huella, M + 3, y + 23.5);
+      doc.setProperties({ title: "Contrato " + datos.cliente, author: "Camote Weddings", subject: "Contrato " + datos.id, keywords: huella });
+      var blob = doc.output("blob");
+      return new Promise(function (res) {
+        var fr = new FileReader(); fr.onload = function () { res({ blob: blob, b64: String(fr.result).split(",")[1] }); }; fr.readAsDataURL(blob);
+      });
+    });
+  }
+
+  function descargar(blob) {
+    var nom = "Contrato-" + datos.cliente.replace(/[^A-Za-z0-9]+/g, "-").replace(/^-|-$/g, "") + "-" + datos.fecha + ".pdf";
+    var url = URL.createObjectURL(blob), a = document.createElement("a");
+    a.href = url; a.download = nom; document.body.appendChild(a); a.click(); document.body.removeChild(a);
+    setTimeout(function () { URL.revokeObjectURL(url); }, 60000);
+  }
+
+  // ---------- Envío ----------
+  function enviar() {
+    if (DEMO) return new Promise(function (r) { setTimeout(function () { r({ ok: true }); }, 900); });
+    var ctl = new AbortController(), to = setTimeout(function () { ctl.abort(); }, 60000);
+    return fetch(C.SCRIPT_URL, {
+      method: "POST", signal: ctl.signal,
+      headers: { "Content-Type": "text/plain;charset=utf-8" },
+      body: JSON.stringify({ t: token, nombre: $("nombre").value.trim(), firmadoEn: firmadoEn, huella: huella, pdf: pdfB64 })
+    }).then(function (r) { clearTimeout(to); return r.json(); });
+  }
+
+  $("go").addEventListener("click", function () {
+    if (enviando) return;
+    enviando = true; $("go").disabled = true;
+    var btn = $("go"); btn.innerHTML = '<span class="spin"></span>Procesando…';
+    $("msg").className = "msg";
+    var prep = pdfBlob ? Promise.resolve() : generarPDF().then(function (r) { pdfBlob = r.blob; pdfB64 = r.b64; });
+    prep.then(function () {
+      if (!yaDescargado) { descargar(pdfBlob); yaDescargado = true; }
+      return enviar();
+    }).then(function (j) {
+      enviando = false;
+      if (j && j.ok) {
+        try { localStorage.setItem("cw_firmado_" + datos.id, "1"); } catch (e) {}
+        $("firmar").querySelectorAll("fieldset, .paper, .sub, h1, .eyebrow").forEach(function (el) { el.classList.add("hidden"); });
+        btn.classList.add("hidden");
+        msg("Contrato firmado, descargado y enviado. ¡Gracias! Tu copia en PDF quedó en tu dispositivo.", "ok");
+      } else if (j && j.error === "duplicado") {
+        btn.classList.add("hidden"); msg("Este contrato ya había sido firmado. Tu PDF se descargó igualmente.", "info");
+      } else {
+        falla("El envío no se completó (" + ((j && j.mensaje) || "error del servidor") + ").");
+      }
+    }).catch(function (err) {
+      if (window.console) console.error(err);
+      enviando = false; falla("No se pudo enviar. Revisa tu conexión a internet.");
+    });
+  });
+
+  function falla(txt) {
+    $("go").textContent = "Reintentar envío"; validar();
+    msg(txt + " Tu PDF ya se descargó y tu firma sigue aquí. Toca «Reintentar envío» cuando tengas conexión.", "err");
+  }
+
+  iniciar();
+})();
+</script>
+</body>
+</html>
