@@ -1,0 +1,173 @@
+<!doctype html>
+<html lang="es">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Contratos | Camote Weddings</title>
+<meta name="robots" content="noindex, nofollow, noarchive">
+<link rel="icon" href="/favicon.ico">
+<link rel="stylesheet" href="../assets/estilo.css">
+</head>
+<body>
+<header class="top"><img src="../assets/logo.png" alt="Camote Weddings"></header>
+<main>
+  <span class="eyebrow">Solo para ti</span>
+  <h1>Crear contrato para firmar</h1>
+  <p class="sub">Llena los datos, genera el enlace y envíaselo al cliente por WhatsApp.</p>
+
+  <form id="f" autocomplete="off">
+    <fieldset>
+      <legend>Cliente</legend>
+      <div class="grid">
+        <label class="full">Nombre completo<input id="cliente" required maxlength="80"></label>
+        <label>Carnet / CI<input id="ci" required maxlength="20"></label>
+        <label>Teléfono / WhatsApp<input id="tel" inputmode="tel" required maxlength="20" placeholder="Ej. 77654396"></label>
+      </div>
+    </fieldset>
+
+    <fieldset>
+      <legend>Evento</legend>
+      <div class="grid">
+        <label>Tipo de evento<input id="evento" required maxlength="40" value="Boda"></label>
+        <label>Fecha del evento<input id="fecha" type="date" required></label>
+        <label>Hora<input id="hora" type="time" required value="10:00"></label>
+        <label>Lugar<input id="lugar" required maxlength="140"></label>
+        <label class="full">Paquete / servicio<input id="paquete" required maxlength="160" placeholder="Ej. paquete personalizado 4 horas + sesión post boda"></label>
+      </div>
+    </fieldset>
+
+    <fieldset>
+      <legend>Pago</legend>
+      <div class="grid">
+        <label>Moneda
+          <select id="moneda"><option value="Bs">Bolivianos (Bs)</option><option value="USD">Dólares (USD)</option></select>
+        </label>
+        <label>Precio total<input id="total" type="number" inputmode="decimal" min="0" step="any" required></label>
+        <label>Anticipo<input id="anticipo" type="number" inputmode="decimal" min="0" step="any" required></label>
+        <label>Saldo<input id="saldo" type="number" inputmode="decimal" min="0" step="any" required></label>
+        <label class="full">Notas (opcional, aparecen en el contrato)<textarea id="notas" maxlength="500"></textarea></label>
+      </div>
+    </fieldset>
+
+    <fieldset>
+      <legend>Seguridad</legend>
+      <div class="grid">
+        <label>Clave de administrador<input id="clave" type="password" autocomplete="off" required placeholder="La que pusiste en el script de Google"></label>
+        <label>El enlace vence en
+          <select id="vigencia"><option value="7">7 días</option><option value="15">15 días</option><option value="30" selected>30 días</option><option value="60">60 días</option></select>
+        </label>
+      </div>
+      <p class="sub" style="margin:8px 0 0;font-size:.8rem;">La clave se guarda solo en este navegador.</p>
+    </fieldset>
+
+    <button class="btn" type="submit">Generar enlace</button>
+    <div class="msg err" id="err"></div>
+  </form>
+
+  <section id="res" class="hidden" style="margin-top:24px;">
+    <fieldset>
+      <legend>Enlace para el cliente</legend>
+      <div class="linkbox" id="link"></div>
+      <div class="row">
+        <button class="btn alt" id="copy" type="button">Copiar enlace</button>
+        <a class="btn wa" id="wa" target="_blank" rel="noopener" style="text-align:center;text-decoration:none;">Enviar por WhatsApp</a>
+      </div>
+      <div class="msg ok" id="copied">Enlace copiado.</div>
+      <p class="sub" style="margin:12px 0 0;font-size:.8rem;">Cada enlace solo se puede firmar una vez.</p>
+    </fieldset>
+  </section>
+</main>
+<footer>Camote Weddings · Contratos</footer>
+
+<script src="../assets/config.js"></script>
+<script>
+(function () {
+  var $ = function (id) { return document.getElementById(id); };
+  var KEY = "cw_admin_clave";
+  try { $("clave").value = localStorage.getItem(KEY) || ""; } catch (e) {}
+
+  // Saldo = total - anticipo, hasta que lo edites a mano
+  var saldoManual = false;
+  $("saldo").addEventListener("input", function () { saldoManual = true; });
+  function auto() {
+    if (saldoManual) return;
+    var t = parseFloat($("total").value), a = parseFloat($("anticipo").value);
+    if (isFinite(t) && isFinite(a)) $("saldo").value = Math.max(0, Math.round((t - a) * 100) / 100);
+  }
+  $("total").addEventListener("input", auto);
+  $("anticipo").addEventListener("input", auto);
+
+  function b64url(str) {
+    var bytes = new TextEncoder().encode(str), s = "";
+    for (var i = 0; i < bytes.length; i++) s += String.fromCharCode(bytes[i]);
+    return btoa(s).replace(/\+/g, "-").replace(/\//g, "_").replace(/=+$/, "");
+  }
+  function hex(buf) {
+    return Array.prototype.map.call(new Uint8Array(buf), function (b) { return ("0" + b.toString(16)).slice(-2); }).join("");
+  }
+  function hmac(key, msg) {
+    var enc = new TextEncoder();
+    return crypto.subtle.importKey("raw", enc.encode(key), { name: "HMAC", hash: "SHA-256" }, false, ["sign"])
+      .then(function (k) { return crypto.subtle.sign("HMAC", k, enc.encode(msg)); }).then(hex);
+  }
+  function newId() {
+    var a = new Uint8Array(9); crypto.getRandomValues(a);
+    return Array.prototype.map.call(a, function (b) { return ("0" + b.toString(16)).slice(-2); }).join("").slice(0, 16);
+  }
+  function showErr(t) { $("err").textContent = t; $("err").classList.add("show"); }
+
+  $("f").addEventListener("submit", function (ev) {
+    ev.preventDefault();
+    $("err").classList.remove("show");
+    if (!window.crypto || !crypto.subtle) { showErr("Este navegador no permite generar enlaces seguros. Usa Chrome o Safari actualizado."); return; }
+    var clave = $("clave").value.trim();
+    if (clave.length < 8) { showErr("La clave de administrador debe tener al menos 8 caracteres."); return; }
+    var total = parseFloat($("total").value), anticipo = parseFloat($("anticipo").value), saldo = parseFloat($("saldo").value);
+    if (!(total > 0) || !(anticipo >= 0) || !(saldo >= 0)) { showErr("Revisa los montos: precio total, anticipo y saldo."); return; }
+    var now = Date.now();
+    var d = {
+      v: 1,
+      id: newId(),
+      cliente: $("cliente").value.trim(),
+      ci: $("ci").value.trim(),
+      tel: $("tel").value.trim(),
+      evento: $("evento").value.trim(),
+      fecha: $("fecha").value,
+      hora: $("hora").value,
+      lugar: $("lugar").value.trim(),
+      paquete: $("paquete").value.trim(),
+      moneda: $("moneda").value,
+      total: total, anticipo: anticipo, saldo: saldo,
+      notas: $("notas").value.trim(),
+      creado: now,
+      exp: now + parseInt($("vigencia").value, 10) * 86400000
+    };
+    var payload = b64url(JSON.stringify(d));
+    hmac(clave, payload).then(function (sig) {
+      try { localStorage.setItem(KEY, clave); } catch (e) {}
+      var base = new URL("../", location.href).href;
+      var url = base + "#" + payload + "." + sig;
+      $("link").textContent = url;
+      var digits = d.tel.replace(/\D/g, "");
+      if (digits.length === 8) digits = "591" + digits;
+      var nombre = d.cliente.split(" ")[0];
+      var texto = "Hola " + nombre + ", te envío tu contrato de Camote Weddings para firmar desde tu celular: " + url;
+      $("wa").href = "https://wa.me/" + digits + "?text=" + encodeURIComponent(texto);
+      $("res").classList.remove("hidden");
+      $("copied").classList.remove("show");
+      $("copy").onclick = function () {
+        var done = function () { $("copied").classList.add("show"); };
+        if (navigator.clipboard && navigator.clipboard.writeText) navigator.clipboard.writeText(url).then(done, function () { fallback(url); done(); });
+        else { fallback(url); done(); }
+      };
+      $("res").scrollIntoView({ behavior: "smooth", block: "start" });
+    });
+  });
+  function fallback(t) {
+    var ta = document.createElement("textarea"); ta.value = t; document.body.appendChild(ta); ta.select();
+    try { document.execCommand("copy"); } catch (e) {} document.body.removeChild(ta);
+  }
+})();
+</script>
+</body>
+</html>
