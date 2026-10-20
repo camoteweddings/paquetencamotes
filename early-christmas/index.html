@@ -173,7 +173,7 @@
   .sample-photo.no-photo::after { content: attr(data-placeholder); font-size: 12px; font-style: italic; color: var(--gold-soft); text-align: center; padding: 0 18px; }
   .sample span { text-align: center; font-size: 13px; color: var(--ink); }
   .mdf-wall { height: 220px; box-sizing: border-box; padding: 22px; border-radius: 6px; background: linear-gradient(180deg, #EFE7D6, #E1D6BC); display: flex; align-items: center; justify-content: center; }
-  .mdf-wall img.mdf-panel { width: 100%; height: 100%; object-fit: cover; border-radius: 2px; box-shadow: 8px 10px 20px rgba(27,18,12,0.35); }
+  .mdf-wall img.mdf-panel { width: auto; height: 100%; aspect-ratio: 1 / 1; object-fit: cover; object-position: 90% 50%; border-radius: 2px; box-shadow: 8px 10px 20px rgba(27,18,12,0.35); }
   .mdf-wall.no-photo img.mdf-panel { display: none; }
   .mdf-wall.no-photo::after { content: attr(data-placeholder); font-size: 12px; font-style: italic; color: var(--muted); text-align: center; padding: 0 18px; }
 
