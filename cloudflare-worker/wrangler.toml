@@ -7,6 +7,14 @@ compatibility_date = "2026-09-11"
 PIXEL_ID = "1608878456861993"
 ALLOWED_ORIGIN = "https://camoteweddings.com"
 
+# Webhook de Cal (POST /cal-webhook). Id de la cuenta publicitaria (no es secreto).
+# Va aquí y no solo en el dashboard, porque `wrangler deploy` borra las variables normales
+# que solo existan en el dashboard.
+META_AD_ACCOUNT_ID = "993073573388010"
+# META_AUDIENCE_NAME = "Personas que agendaron"   # opcional
+# Secretos del webhook (no van en este archivo):
+#   wrangler secret put CAL_WEBHOOK_SECRET
+
 # El token de acceso NO va en este archivo por seguridad.
 # Se configura como secreto con:
 #   wrangler secret put META_ACCESS_TOKEN
