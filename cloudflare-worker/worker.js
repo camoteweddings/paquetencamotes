@@ -47,7 +47,8 @@ async function validSignature(rawBody, signature, secret) {
   return diff === 0;
 }
 
-// Normaliza y aplica hash como pide Meta: minúsculas sin espacios; teléfono solo con dígitos.
+// Normaliza y aplica hash como pide Meta: correo en minúsculas sin espacios; teléfono solo con dígitos.
+// Meta solo acepta combinaciones de columnas definidas (EMAIL_SHA256, PHONE_SHA256, ...), no nombre suelto.
 async function hashedRow(attendee, responses) {
   const email = String(attendee.email || responses?.email?.value || "").trim().toLowerCase();
   const phoneRaw =
@@ -56,11 +57,8 @@ async function hashedRow(attendee, responses) {
     responses?.phone?.value ||
     "";
   const phone = String(phoneRaw).replace(/\D/g, "");
-  const parts = String(attendee.name || responses?.name?.value || "").trim().toLowerCase().split(/\s+/).filter(Boolean);
-  const fn = parts[0] || "";
-  const ln = parts.slice(1).join(" ");
   const h = (v) => (v ? sha256(v) : Promise.resolve(""));
-  return Promise.all([h(email), h(phone), h(fn), h(ln)]);
+  return Promise.all([h(email), h(phone)]);
 }
 
 async function graph(path, env, params, method = "POST") {
@@ -129,12 +127,13 @@ async function handleCalWebhook(request, env) {
     const rows = await Promise.all(attendees.map((a) => hashedRow(a, payload.responses)));
     const id = await audienceId(env);
     const result = await graph(`${id}/users`, env, {
-      payload: JSON.stringify({ schema: ["EMAIL_SHA256", "PHONE_SHA256", "FN_SHA256", "LN_SHA256"], data: rows }),
+      payload: JSON.stringify({ schema: ["EMAIL_SHA256", "PHONE_SHA256"], data: rows }),
     });
     return new Response(JSON.stringify({ ok: true, added: rows.length, audience_id: id, meta: result }), {
       headers: { "Content-Type": "application/json" },
     });
   } catch (e) {
+    console.error("cal-webhook: fallo al subir la audiencia a Meta:", String(e.message || e));
     return new Response(JSON.stringify({ ok: false, error: String(e.message || e) }), {
       status: 502,
       headers: { "Content-Type": "application/json" },
