@@ -1,6 +1,14 @@
-// Envía el evento "Lead" tanto al Pixel del navegador como al Conversions API (server-side)
+// Envía eventos de conversión tanto al Pixel del navegador como al Conversions API (server-side)
 // vía el Worker de Cloudflare, usando el mismo event_id para que Meta los deduplique.
 // CAPI_ENDPOINT se completa al desplegar el Worker (ver cloudflare-worker/worker.js).
+//
+// Mapa de eventos del embudo (cada evento significa lo que dice su nombre):
+//   ViewContent      -> alguien vio la página (automático, una vez por página y sesión)
+//   Contact          -> clic en WhatsApp (una vez por persona cada 30 días)
+//   InitiateCheckout -> eligió un paquete y abrió el calendario (una vez por paquete y sesión)
+//   Schedule         -> reserva completada en Cal.com (bookingSuccessful, una por reserva)
+//   Purchase         -> SOLO cuando el pago ya entró (ver trackPurchase; hoy ningún botón la llama)
+//   Lead             -> disponible (trackLead) pero sin botones asignados
 var CAPI_ENDPOINT = "https://camote-capi-relay.victorhugo9719.workers.dev";
 
 function getCookie(name) {
@@ -8,33 +16,14 @@ function getCookie(name) {
   return match ? decodeURIComponent(match[1]) : null;
 }
 
-// Un solo Lead por cliente: se recuerda en localStorage (30 días) y en memoria,
-// así varios clics en "Reservar" no generan eventos repetidos en Meta.
-var LEAD_TTL_MS = 30 * 24 * 60 * 60 * 1000;
-var leadSent = false;
-
-function leadAlreadySent() {
-  if (leadSent) return true;
-  try {
-    var t = parseInt(localStorage.getItem("camote_lead_sent"), 10);
-    if (t && Date.now() - t < LEAD_TTL_MS) return true;
-  } catch (e) {}
-  return false;
+function newEventId(prefix) {
+  return prefix + "_" + Date.now() + "_" + Math.random().toString(36).slice(2);
 }
 
-function markLeadSent() {
-  leadSent = true;
-  try { localStorage.setItem("camote_lead_sent", String(Date.now())); } catch (e) {}
-}
-
-function trackLead() {
-  if (leadAlreadySent()) return;
-  markLeadSent();
-
-  var eventId = "lead_" + Date.now() + "_" + Math.random().toString(36).slice(2);
-
+// Envía un evento por Pixel + servidor con el mismo event_id.
+function sendEvent(name, eventId, custom) {
   if (window.fbq) {
-    fbq("track", "Lead", {}, { eventID: eventId });
+    fbq("track", name, custom || {}, { eventID: eventId });
   }
 
   if (!CAPI_ENDPOINT) return;
@@ -45,14 +34,68 @@ function trackLead() {
       headers: { "Content-Type": "application/json" },
       keepalive: true,
       body: JSON.stringify({
-        event_name: "Lead",
+        event_name: name,
         event_id: eventId,
         event_source_url: location.href,
         fbp: getCookie("_fbp"),
         fbc: getCookie("_fbc"),
+        custom_data: custom || undefined,
       }),
     }).catch(function () {});
   } catch (e) {}
+}
+
+// Un evento por cliente cada 30 días: se recuerda en localStorage y en memoria,
+// así varios clics no generan eventos repetidos en Meta. Devuelve true si ya se había enviado.
+var ONCE_TTL_MS = 30 * 24 * 60 * 60 * 1000;
+var onceInMemory = {};
+
+function alreadySentOnce(key) {
+  if (onceInMemory[key]) return true;
+  onceInMemory[key] = true;
+  try {
+    var t = parseInt(localStorage.getItem(key), 10);
+    if (t && Date.now() - t < ONCE_TTL_MS) return true;
+    localStorage.setItem(key, String(Date.now()));
+  } catch (e) {}
+  return false;
+}
+
+// Un evento por sesión del navegador para la clave dada. Devuelve true si ya se había enviado.
+function alreadySentInSession(key) {
+  try {
+    if (sessionStorage.getItem(key)) return true;
+    sessionStorage.setItem(key, "1");
+  } catch (e) {}
+  return false;
+}
+
+// Clic en el botón de WhatsApp: evento estándar "Contact".
+function trackContact() {
+  if (alreadySentOnce("camote_contact_sent")) return;
+  sendEvent("Contact", newEventId("contact"));
+}
+
+// Lead calificado (p. ej. confirmó datos o agendó y es un prospecto real). Sin botones asignados por ahora.
+function trackLead() {
+  if (alreadySentOnce("camote_lead_sent")) return;
+  sendEvent("Lead", newEventId("lead"));
+}
+
+// Vio la página: "ViewContent", una vez por página y sesión.
+function trackViewContent() {
+  if (alreadySentInSession("camote_vc_" + location.pathname)) return;
+  sendEvent("ViewContent", newEventId("viewcontent"), { content_name: document.title });
+}
+
+// Eligió un paquete y abrió el calendario de reserva: "InitiateCheckout" (compra iniciada, NO venta).
+function trackInitiateCheckout(value, currency, name) {
+  if (alreadySentInSession("camote_ic_" + (name || ""))) return;
+  sendEvent("InitiateCheckout", newEventId("initiatecheckout"), {
+    value: value,
+    currency: currency || "BOB",
+    content_name: name || "",
+  });
 }
 
 // Reserva completada (Cal.com bookingSuccessful): evento estándar "Schedule", uno por reserva.
@@ -65,60 +108,19 @@ function trackSchedule(uid) {
     sessionStorage.setItem("camote_schedule_ids", done.concat(eventId).join(","));
   } catch (e) {}
 
-  if (window.fbq) {
-    fbq("track", "Schedule", {}, { eventID: eventId });
-  }
-
-  if (!CAPI_ENDPOINT) return;
-
-  try {
-    fetch(CAPI_ENDPOINT, {
-      method: "POST",
-      headers: { "Content-Type": "application/json" },
-      keepalive: true,
-      body: JSON.stringify({
-        event_name: "Schedule",
-        event_id: eventId,
-        event_source_url: location.href,
-        fbp: getCookie("_fbp"),
-        fbc: getCookie("_fbc"),
-      }),
-    }).catch(function () {});
-  } catch (e) {}
+  sendEvent("Schedule", eventId);
 }
 
-// Venta: se marca al elegir un paquete y abrir el calendario de reserva.
-// Un solo Purchase por cliente (30 días). Pixel + Conversions API con el mismo event_id.
+// Venta: llamar SOLO cuando el pago ya entró (p. ej. botón "ya hice mi pago" en una thank-you page de pago).
+// Un solo Purchase por cliente (30 días). Hoy ningún botón la llama.
 function trackPurchase(value, currency, name) {
-  var key = "camote_purchase_sent";
-  try {
-    var t = parseInt(localStorage.getItem(key), 10);
-    if (t && Date.now() - t < LEAD_TTL_MS) return;
-    localStorage.setItem(key, String(Date.now()));
-  } catch (e) {}
-
-  var eventId = "purchase_" + Date.now() + "_" + Math.random().toString(36).slice(2);
-  var custom = { value: value, currency: currency || "BOB", content_name: name || "" };
-
-  if (window.fbq) {
-    fbq("track", "Purchase", custom, { eventID: eventId });
-  }
-
-  if (!CAPI_ENDPOINT) return;
-
-  try {
-    fetch(CAPI_ENDPOINT, {
-      method: "POST",
-      headers: { "Content-Type": "application/json" },
-      keepalive: true,
-      body: JSON.stringify({
-        event_name: "Purchase",
-        event_id: eventId,
-        event_source_url: location.href,
-        fbp: getCookie("_fbp"),
-        fbc: getCookie("_fbc"),
-        custom_data: custom,
-      }),
-    }).catch(function () {});
-  } catch (e) {}
+  if (alreadySentOnce("camote_purchase_sent")) return;
+  sendEvent("Purchase", newEventId("purchase"), {
+    value: value,
+    currency: currency || "BOB",
+    content_name: name || "",
+  });
 }
+
+// Registra la visita automáticamente en cada página que cargue este script.
+trackViewContent();
