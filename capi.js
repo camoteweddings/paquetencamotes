@@ -7,7 +7,7 @@
 //   Contact          -> clic en WhatsApp (una vez por persona cada 30 días)
 //   InitiateCheckout -> eligió un paquete y abrió el calendario (una vez por paquete y sesión)
 //   Schedule         -> reserva completada en Cal.com (bookingSuccessful, una por reserva)
-//   Purchase         -> SOLO cuando el pago ya entró (ver trackPurchase; hoy ningún botón la llama)
+//   Purchase         -> SOLO cuando el cliente confirma su pago (botón "Ya pagué" en /early-christmas/gracias/)
 //   Lead             -> disponible (trackLead) pero sin botones asignados
 var CAPI_ENDPOINT = "https://camote-capi-relay.victorhugo9719.workers.dev";
 
@@ -111,11 +111,12 @@ function trackSchedule(uid) {
   sendEvent("Schedule", eventId);
 }
 
-// Venta: llamar SOLO cuando el pago ya entró (p. ej. botón "ya hice mi pago" en una thank-you page de pago).
-// Un solo Purchase por cliente (30 días). Hoy ningún botón la llama.
-function trackPurchase(value, currency, name) {
-  if (alreadySentOnce("camote_purchase_sent")) return;
-  sendEvent("Purchase", newEventId("purchase"), {
+// Venta: llamar SOLO cuando el cliente confirma que el pago ya está hecho (botón "Ya pagué" de la thank-you page).
+// Un Purchase por reserva: orderId (uid de la reserva) evita duplicados y comparte event_id con el servidor.
+function trackPurchase(value, currency, name, orderId) {
+  var key = "camote_purchase_" + (orderId || "any");
+  if (alreadySentOnce(key)) return;
+  sendEvent("Purchase", "purchase_" + (orderId || Date.now() + "_" + Math.random().toString(36).slice(2)), {
     value: value,
     currency: currency || "BOB",
     content_name: name || "",
@@ -123,4 +124,4 @@ function trackPurchase(value, currency, name) {
 }
 
 // Registra la visita automáticamente en cada página que cargue este script.
-trackViewContent();
+if (!window.CAMOTE_NO_VC) trackViewContent();

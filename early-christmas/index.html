@@ -536,7 +536,13 @@ fbq('track', 'PageView');
         action: "bookingSuccessful",
         callback: function (e) {
           var d = (e && e.detail && e.detail.data) || {};
-          if (typeof trackSchedule === 'function') trackSchedule(d.uid || (d.booking && d.booking.uid));
+          var uid = d.uid || (d.booking && d.booking.uid);
+          if (typeof trackSchedule === 'function') trackSchedule(uid);
+          var card = document.querySelector('.card[data-cal-ns="' + ns + '"]');
+          var m = card && card.querySelector('.price').textContent.match(/\d+(?:[.,]\d+)?/);
+          var url = 'gracias/?p=' + encodeURIComponent(card ? card.getAttribute('data-package') : '') +
+            '&v=' + (m ? parseFloat(m[0].replace(',', '.')) : 0) + '&o=' + encodeURIComponent(uid || '');
+          setTimeout(function () { location.href = url; }, 1800);
         }
       });
     });
