@@ -595,7 +595,7 @@ fbq('track', 'PageView');
       if (typeof trackInitiateCheckout === 'function') trackInitiateCheckout(valor, 'BOB', nombre);
       Cal.ns[card.getAttribute('data-cal-ns')]("modal", {
         calLink: card.getAttribute('data-cal-link'),
-        config: { layout: "month_view", notes: "Paquete: " + nombre + " (" + precio + ")" }
+        config: { layout: "month_view", month: "2026-11", notes: "Paquete: " + nombre + " (" + precio + ")" }
       });
     }
   </script>
