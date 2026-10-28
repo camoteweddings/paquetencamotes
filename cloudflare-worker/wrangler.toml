@@ -11,6 +11,8 @@ ALLOWED_ORIGIN = "https://camoteweddings.com"
 # Va aquí y no solo en el dashboard, porque `wrangler deploy` borra las variables normales
 # que solo existan en el dashboard.
 META_AD_ACCOUNT_ID = "993073573388010"
+# Solo estos tipos de evento de Cal entran a la audiencia y disparan Schedule por servidor.
+ALLOWED_EVENT_SLUGS = "save-the-date,minis-navidenas,minis-navidenas-45-min"
 # META_AUDIENCE_NAME = "Personas que agendaron"   # opcional
 # Secretos del webhook (no van en este archivo):
 #   wrangler secret put CAL_WEBHOOK_SECRET

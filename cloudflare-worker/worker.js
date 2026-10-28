@@ -15,6 +15,7 @@
 // Solo para el webhook de Cal:
 //   CAL_WEBHOOK_SECRET   -> secreto que también se pega en Cal (SECRETO)
 //   META_AD_ACCOUNT_ID   -> id de la cuenta publicitaria, con o sin el prefijo "act_" (no secreto)
+//   ALLOWED_EVENT_SLUGS  -> tipos de evento de Cal que cuentan, separados por coma (no secreto)
 //   META_AUDIENCE_NAME   -> (opcional) nombre de la audiencia, por defecto "Personas que agendaron"
 //   META_AUDIENCE_ID     -> (opcional) id de una audiencia ya creada, para no buscarla por nombre
 // El token del webhook necesita permisos ads_management y business_management.
@@ -92,6 +93,44 @@ async function audienceId(env) {
   return created.id;
 }
 
+// Envía "Schedule" por Conversions API con correo/teléfono/nombre hasheados (mejor coincidencia).
+// event_id = schedule_<uid de la reserva>, el mismo que usa capi.js en el navegador: Meta deduplica.
+async function sendScheduleEvent(env, payload, createdAt, attendee) {
+  if (!env.PIXEL_ID || !payload.uid) return null;
+  const email = String(attendee.email || payload.responses?.email?.value || "").trim().toLowerCase();
+  const phone = String(
+    attendee.phoneNumber || payload.responses?.attendeePhoneNumber?.value || payload.responses?.phone?.value || ""
+  ).replace(/\D/g, "");
+  const parts = String(attendee.name || payload.responses?.name?.value || "").trim().toLowerCase().split(/\s+/).filter(Boolean);
+  const fn = parts[0] || "";
+  const ln = parts.slice(1).join(" ");
+  const user_data = {};
+  for (const [key, value] of [["em", email], ["ph", phone], ["fn", fn], ["ln", ln]]) {
+    if (value) user_data[key] = [await sha256(value)];
+  }
+  const t = Date.parse(createdAt);
+  const eventData = {
+    event_name: "Schedule",
+    event_time: Math.floor((isFinite(t) ? t : Date.now()) / 1000),
+    event_id: "schedule_" + payload.uid,
+    event_source_url: env.ALLOWED_ORIGIN || "https://camoteweddings.com",
+    action_source: "website",
+    user_data,
+  };
+  const res = await fetch(`${GRAPH}/${env.PIXEL_ID}/events`, {
+    method: "POST",
+    headers: { "Content-Type": "application/json" },
+    body: JSON.stringify({
+      data: [eventData],
+      access_token: env.META_ACCESS_TOKEN,
+      ...(env.TEST_EVENT_CODE ? { test_event_code: env.TEST_EVENT_CODE } : {}),
+    }),
+  });
+  const json = await res.json().catch(() => ({}));
+  if (!res.ok) throw new Error(`Meta ${res.status}: ${JSON.stringify(json.error || json)}`);
+  return json;
+}
+
 async function handleCalWebhook(request, env) {
   if (!env.CAL_WEBHOOK_SECRET || !env.META_AD_ACCOUNT_ID || !env.META_ACCESS_TOKEN) {
     return new Response("Webhook not configured", { status: 500 });
@@ -118,6 +157,18 @@ async function handleCalWebhook(request, env) {
   }
 
   const payload = event.payload || {};
+
+  // Filtro por tipo de evento de Cal (slug): solo cuentan las reservas de los eventos listados en
+  // ALLOWED_EVENT_SLUGS. Si Cal no manda el slug, se procesa igual para no perder reservas.
+  const slug = payload.eventType?.slug || payload.type || "";
+  console.log("cal-webhook slug:", slug || "(sin slug)");
+  const allowed = String(env.ALLOWED_EVENT_SLUGS || "").split(",").map((s) => s.trim()).filter(Boolean);
+  if (slug && allowed.length && !allowed.includes(slug)) {
+    return new Response(JSON.stringify({ ok: true, ignored: "slug", slug }), {
+      headers: { "Content-Type": "application/json" },
+    });
+  }
+
   const attendees = (payload.attendees || []).filter((a) => a && (a.email || a.name));
   if (!attendees.length) {
     return new Response(JSON.stringify({ ok: true, added: 0 }), { headers: { "Content-Type": "application/json" } });
@@ -126,12 +177,20 @@ async function handleCalWebhook(request, env) {
   try {
     const rows = await Promise.all(attendees.map((a) => hashedRow(a, payload.responses)));
     const id = await audienceId(env);
-    const result = await graph(`${id}/users`, env, {
-      payload: JSON.stringify({ schema: ["EMAIL_SHA256", "PHONE_SHA256"], data: rows }),
-    });
-    return new Response(JSON.stringify({ ok: true, added: rows.length, audience_id: id, meta: result }), {
-      headers: { "Content-Type": "application/json" },
-    });
+    const [audience, schedule] = await Promise.allSettled([
+      graph(`${id}/users`, env, {
+        payload: JSON.stringify({ schema: ["EMAIL_SHA256", "PHONE_SHA256"], data: rows }),
+      }),
+      sendScheduleEvent(env, payload, event.createdAt, attendees[0]),
+    ]);
+    if (audience.status === "rejected") throw audience.reason;
+    if (schedule.status === "rejected") {
+      console.error("cal-webhook: fallo al enviar Schedule por CAPI:", String(schedule.reason?.message || schedule.reason));
+    }
+    return new Response(
+      JSON.stringify({ ok: true, added: rows.length, audience_id: id, meta: audience.value, schedule_sent: schedule.status === "fulfilled" }),
+      { headers: { "Content-Type": "application/json" } }
+    );
   } catch (e) {
     console.error("cal-webhook: fallo al subir la audiencia a Meta:", String(e.message || e));
     return new Response(JSON.stringify({ ok: false, error: String(e.message || e) }), {
