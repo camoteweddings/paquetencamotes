@@ -373,7 +373,6 @@ fbq('track', 'PageView');
         <div>Paga con el QR de abajo y envíanos tu comprobante</div>
         <div>Tu fecha se confirma cuando verificamos el pago</div>
       </div>
-      <a class="hero-cta" href="#pago">Ir al pago</a>
     </div>
     <div class="hero-deco" aria-hidden="true">
       <div class="deco-star" style="top:11%; left:7%; width:46px; height:46px; transform:rotate(-8deg);">
@@ -407,16 +406,15 @@ fbq('track', 'PageView');
         <hr>
         <p>Escanea este QR desde la app de tu banco. El monto es el 70% del paquete que elegiste.</p>
         <img id="qr" class="qr" alt="QR de pago de tu reserva" width="680" height="911">
-        <a class="card-cta" id="qr-save" href="#" download>Guardar el QR</a>
       </div>
       <div class="card premium">
         <span class="name serif">2. Envía tu comprobante</span>
         <hr>
-        <p>Cuando hayas pagado, adjunta aquí la captura o foto de tu comprobante de depósito y envíala a nuestro WhatsApp.</p>
-        <label class="file-label" for="comprobante">Adjuntar comprobante de depósito</label>
+        <p>Cuando hayas pagado, adjunta tu comprobante de depósito y envíalo a nuestro WhatsApp.</p>
+        <label class="file-label" for="comprobante">Enviar comprobante</label>
         <input type="file" id="comprobante" accept="image/*,application/pdf">
-        <span class="file-name" id="file-name">Aún no has adjuntado nada</span>
-        <button type="button" class="card-cta" id="btn-pago" disabled>Ya hice mi pago, enviar comprobante</button>
+        <span class="file-name" id="file-name">Adjunta aquí la captura o foto de tu depósito</span>
+        <button type="button" class="card-cta" id="btn-pago" disabled>Enviar por WhatsApp</button>
         <p class="fine" id="pago-ok" hidden>¡Gracias! Cuando recibamos tu comprobante, verificamos el pago y confirmamos tu fecha.</p>
         <p class="fine">Se abrirá WhatsApp. Si tu comprobante no aparece adjunto, adjúntalo en el chat con el clip 📎.</p>
       </div>
@@ -448,14 +446,20 @@ fbq('track', 'PageView');
       if (!pk) return rechazar();
       window.__pago = { paquete: pk.nombre, valor: pk.anticipo, orden: orden };
       $('resumen').textContent = 'Reservaste: ' + pk.nombre + '. Para confirmar tu fecha, el anticipo es de Bs ' + pk.anticipo + ' (70% del paquete).';
-      $('qr').src = pk.qr; $('qr-save').href = pk.qr;
+      $('qr').src = pk.qr;
       $('verificando').hidden = true; $('gate').hidden = false;
       window.dispatchEvent(new Event('resize'));   // recalcula la nieve acumulada sobre las tarjetas
     }
 
     if (!/^[A-Za-z0-9_-]{8,64}$/.test(orden)) { location.replace('../'); return; }
 
-    // Cal avisa al Worker por webhook y a veces tarda; se espera hasta ~100 s antes de rendirse.
+    // Vía rápida: la landing guarda la reserva en este navegador justo al agendar, así que no hay espera.
+    var local = '';
+    try { local = localStorage.getItem('camote_booking_' + orden) || ''; } catch (e) {}
+    if (PAQUETES[local]) { mostrar(local); }
+    else {
+
+    // Respaldo (otro navegador o dispositivo): se consulta al Worker, que recibe el aviso de Cal con algo de demora.
     var intentos = 0, MAX = 40, PAUSA = 2500;
     (function verificar() {
       fetch(API + '/booking?uid=' + encodeURIComponent(orden) + '&_=' + Date.now())
@@ -467,12 +471,13 @@ fbq('track', 'PageView');
         })
         .catch(function () { if (++intentos < MAX) setTimeout(verificar, PAUSA); else rechazar(); });
     })();
+    }
 
     /* ---- comprobante ---- */
     var input = $('comprobante'), btn = $('btn-pago');
     input.addEventListener('change', function () {
       var f = input.files && input.files[0];
-      $('file-name').textContent = f ? f.name : 'Aún no has adjuntado nada';
+      $('file-name').textContent = f ? f.name : 'Adjunta aquí la captura o foto de tu depósito';
       btn.disabled = !f;
     });
 

@@ -535,7 +535,10 @@ fbq('track', 'PageView');
           var d = (e && e.detail && e.detail.data) || {};
           var uid = d.uid || (d.booking && d.booking.uid);
           if (typeof trackSchedule === 'function') trackSchedule(uid);
-          if (uid) setTimeout(function () { location.href = 'gracias/?o=' + encodeURIComponent(uid); }, 1800);
+          if (uid) {
+            try { localStorage.setItem('camote_booking_' + uid, ns); } catch (err) {}
+            setTimeout(function () { location.href = 'gracias/?o=' + encodeURIComponent(uid); }, 600);
+          }
         }
       });
     });
