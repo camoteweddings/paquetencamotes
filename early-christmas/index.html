@@ -430,14 +430,14 @@ fbq('track', 'PageView');
       <span class="label">Paquetes</span>
     </div>
     <div class="cards" id="paquetes">
-      <div class="card" data-package="Mini Sesión" data-cal-ns="minis-navidenas" data-cal-link="camoteweddings/minis-navidenas">
+      <div class="card" data-package="Mini Sesión" data-booking-ns="minis-navidenas" data-booking-link="camoteweddings/minis-navidenas">
         <span class="name serif">Mini Sesión</span>
         <span class="price serif">Bs.350</span>
         <hr>
         <p>30 minutos de sesión + 8 fotos digitales editadas + galería en línea</p>
         <button type="button" class="card-cta" onclick="reservarPaquete(this)">Elegir fecha y horario</button>
       </div>
-      <div class="card premium" data-package="Sesión Extendida" data-cal-ns="minis-navidenas-45-min" data-cal-link="camoteweddings/minis-navidenas-45-min">
+      <div class="card premium" data-package="Sesión Extendida" data-booking-ns="minis-navidenas-45-min" data-booking-link="camoteweddings/minis-navidenas-45-min">
         <span class="name serif">Sesión Extendida</span>
         <span class="price serif">Bs.550</span>
         <hr>
@@ -535,7 +535,7 @@ fbq('track', 'PageView');
           var d = (e && e.detail && e.detail.data) || {};
           var uid = d.uid || (d.booking && d.booking.uid);
           if (typeof trackSchedule === 'function') trackSchedule(uid);
-          var card = document.querySelector('.card[data-cal-ns="' + ns + '"]');
+          var card = document.querySelector('.card[data-booking-ns="' + ns + '"]');
           var m = card && card.querySelector('.price').textContent.match(/\d+(?:[.,]\d+)?/);
           var url = 'gracias/?p=' + encodeURIComponent(card ? card.getAttribute('data-package') : '') +
             '&v=' + (m ? parseFloat(m[0].replace(',', '.')) : 0) + '&o=' + encodeURIComponent(uid || '');
@@ -593,8 +593,8 @@ fbq('track', 'PageView');
       var m = precio.match(/\d+(?:[.,]\d+)?/);
       var valor = m ? parseFloat(m[0].replace(',', '.')) : 0;
       if (typeof trackInitiateCheckout === 'function') trackInitiateCheckout(valor, 'BOB', nombre);
-      Cal.ns[card.getAttribute('data-cal-ns')]("modal", {
-        calLink: card.getAttribute('data-cal-link'),
+      Cal.ns[card.getAttribute('data-booking-ns')]("modal", {
+        calLink: card.getAttribute('data-booking-link'),
         config: { layout: "month_view", month: "2026-11", notes: "Paquete: " + nombre + " (" + precio + ")" }
       });
     }
