@@ -308,13 +308,7 @@
   .gate-back { display: block; margin-top: 22px; color: var(--gold-soft); font-size: 14px; }
   body.gate-closed { background: var(--night); }
   .qr { width: 100%; max-width: 340px; height: auto; align-self: center; border-radius: 10px; }
-  .file-label { display: block; font-size: 13px; font-weight: 600; color: var(--maroon); }
-  .card.premium .file-label { color: var(--gold); }
-  .card.premium input[type=file] { color: var(--cream); }
-  .card.premium .file-name, .card.premium .fine { color: #D8CFC0; }
-  input[type=file] { width: 100%; font-size: 13px; color: var(--ink); }
-  .file-name { font-size: 12.5px; color: var(--muted); word-break: break-all; }
-  .card-cta:disabled { opacity: .45; cursor: not-allowed; }
+  .card.premium .fine { color: #D8CFC0; }
   .card .fine { font-size: 12.5px; color: var(--muted); margin: 0; }
   @media (max-width: 899px) {
     .hero { height: auto; min-height: 0; max-height: none; }
@@ -408,15 +402,11 @@ fbq('track', 'PageView');
         <img id="qr" class="qr" alt="QR de pago de tu reserva" width="680" height="911">
       </div>
       <div class="card premium">
-        <span class="name serif">2. Envía tu comprobante</span>
+        <span class="name serif">2. Envía tu comprobante por WhatsApp</span>
         <hr>
-        <p>Cuando hayas pagado, adjunta tu comprobante de depósito y envíalo a nuestro WhatsApp.</p>
-        <label class="file-label" for="comprobante">Enviar comprobante</label>
-        <input type="file" id="comprobante" accept="image/*,application/pdf">
-        <span class="file-name" id="file-name">Adjunta aquí la captura o foto de tu depósito</span>
-        <button type="button" class="card-cta" id="btn-pago" disabled>Enviar por WhatsApp</button>
+        <p>Cuando hayas pagado, escríbenos por WhatsApp y adjunta en el chat la captura o foto de tu comprobante de depósito. Así verificamos tu pago y confirmamos tu fecha.</p>
+        <a class="card-cta" id="btn-pago" href="#" target="_blank" rel="noopener">Enviar comprobante por WhatsApp</a>
         <p class="fine" id="pago-ok" hidden>¡Gracias! Cuando recibamos tu comprobante, verificamos el pago y confirmamos tu fecha.</p>
-        <p class="fine">Se abrirá WhatsApp. Si tu comprobante no aparece adjunto, adjúntalo en el chat con el clip 📎.</p>
       </div>
     </div>
 
@@ -473,36 +463,15 @@ fbq('track', 'PageView');
     })();
     }
 
-    /* ---- comprobante ---- */
-    var input = $('comprobante'), btn = $('btn-pago');
-    input.addEventListener('change', function () {
-      var f = input.files && input.files[0];
-      $('file-name').textContent = f ? f.name : 'Adjunta aquí la captura o foto de tu depósito';
-      btn.disabled = !f;
-    });
-
-    function registrarPago() {
+    /* ---- comprobante: el botón abre WhatsApp con el mensaje; el comprobante se adjunta en el chat ---- */
+    var btn = $('btn-pago');
+    btn.addEventListener('click', function (e) {
+      e.preventDefault();
       var p = window.__pago || {};
+      var texto = 'Hola, ya realicé el pago de mi reserva (' + p.paquete + ', Bs ' + p.valor + '). Te envío mi comprobante.';
       if (typeof trackPurchase === 'function') trackPurchase(p.valor || 0, 'BOB', p.paquete, p.orden);
       $('pago-ok').hidden = false;
-    }
-
-    btn.addEventListener('click', function () {
-      var f = input.files && input.files[0]; if (!f) return;
-      var p = window.__pago || {};
-      var texto = 'Hola, ya realicé el pago de mi reserva (' + p.paquete + ', Bs ' + p.valor + '). Adjunto mi comprobante.';
-      var enviarPorChat = function () {
-        registrarPago();
-        window.open('https://wa.me/59177654396?text=' + encodeURIComponent(texto), '_blank', 'noopener');
-      };
-      if (navigator.canShare && navigator.canShare({ files: [f] })) {
-        navigator.share({ files: [f], text: texto }).then(registrarPago).catch(function (e) {
-          if (e && e.name === 'AbortError') return;   // canceló: no se registra el pago
-          enviarPorChat();
-        });
-      } else {
-        enviarPorChat();
-      }
+      window.open('https://wa.me/59177654396?text=' + encodeURIComponent(texto), '_blank', 'noopener');
     });
   })();
   </script>
