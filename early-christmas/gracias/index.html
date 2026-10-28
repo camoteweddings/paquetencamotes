@@ -1,13 +1,308 @@
-<!DOCTYPE html>
+<!doctype html>
 <html lang="es">
 <head>
-<meta charset="UTF-8">
-<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=0">
-<title>¡Reserva agendada! | Camote Weddings</title>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>¡Reserva agendada! | Minis navideñas | Camote Weddings</title>
 <meta name="robots" content="noindex, nofollow">
-<link rel="icon" type="image/png" sizes="180x180" href="https://res.cloudinary.com/rauzqcoj/image/upload/c_pad,b_white,w_180,h_180,f_png/LOGO_CAMOTE-06">
+<link rel="icon" href="https://res.cloudinary.com/rauzqcoj/image/upload/f_auto,q_auto/LOGO_CAMOTE-02">
 <link rel="shortcut icon" href="/favicon.ico">
-<link rel="stylesheet" href="../../style.css">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Archivo:wght@700;900&family=Playfair+Display:wght@600;700;800&family=Work+Sans:wght@400;500;600&display=swap">
+<style>
+  :root {
+    --night: #1B120C;
+    --night-2: #2E1D12;
+    --maroon: #7A2020;
+    --gold: #C9A24B;
+    --gold-soft: #E4C989;
+    --cream: #FAF8F3;
+    --line: #E3DDCE;
+    --ink: #4A4F4B;
+    --muted: #6B7068;
+  }
+  * { box-sizing: border-box; }
+  body { margin: 0; background: var(--cream); font-family: 'Work Sans', system-ui, sans-serif; color: var(--ink); }
+  .serif { font-family: 'Playfair Display', Georgia, serif; }
+  .wrap { max-width: 1080px; margin: 0 auto; }
+
+  /* ---- site nav ---- */
+  nav.site-nav {
+    display: flex; align-items: center; justify-content: space-between;
+    flex-wrap: wrap; row-gap: 14px;
+    padding: 18px 24px;
+    background: var(--night);
+  }
+  .logo { display: flex; align-items: center; gap: 10px; font-family: 'Archivo', sans-serif; font-weight: 700; font-size: 1.1rem; color: var(--cream); text-decoration: none; letter-spacing: -0.01em; }
+  .logo-mark { width: 22px; height: 22px; filter: invert(1) brightness(1.6); }
+  .nav-links { display: flex; gap: 26px; font-size: 0.85rem; letter-spacing: 0.4px; }
+  .nav-links a { color: #C9BFAF; text-decoration: none; }
+  .nav-links a:hover { color: var(--gold-soft); }
+  .nav-links a.current { color: var(--gold); font-weight: 600; }
+  .pill { display: inline-flex; align-items: center; justify-content: center; border-radius: 999px; padding: 10px 20px; font-size: 0.82rem; font-weight: 600; text-decoration: none; white-space: nowrap; }
+  .pill-solid { background: var(--gold); color: var(--night); }
+  .pill-solid:hover { background: var(--gold-soft); }
+  @media (max-width: 780px) {
+    nav.site-nav { justify-content: center; text-align: center; }
+    .logo { order: 1; flex: 1 1 auto; }
+    nav.site-nav > .pill { order: 2; }
+    .nav-links { order: 3; width: 100%; justify-content: center; gap: 16px; flex-wrap: wrap; }
+  }
+
+  /* ---- hero ---- */
+  .hero {
+    position: relative; width: 100%;
+    height: 76vw; max-height: 680px; min-height: 460px;
+    overflow: hidden; background: var(--night);
+  }
+  .hero-photo { position: absolute; inset: 0; z-index: 0; }
+  .hero-photo img { width: 100%; height: 100%; object-fit: cover; object-position: 50% 30%; display: block; }
+  .hero::after {
+    content: ""; position: absolute; inset: 0;
+    background: linear-gradient(180deg, rgba(27,18,12,0.15) 0%, rgba(27,18,12,0.1) 35%, rgba(20,13,8,0.8) 100%), linear-gradient(90deg, rgba(20,13,8,0.85) 0%, rgba(20,13,8,0.2) 60%);
+  }
+  .hero-text { position: absolute; left: 24px; right: 24px; top: 50%; transform: translateY(-50%); z-index: 1; }
+  @media (min-width: 900px) {
+    .hero-photo { left: auto; width: 46%; }
+    .hero-photo img { object-position: 55% 22%; }
+    .hero::after { background: linear-gradient(180deg, rgba(27,18,12,0.1) 0%, rgba(27,18,12,0.05) 35%, rgba(20,13,8,0.8) 100%), linear-gradient(90deg, rgba(20,13,8,0.92) 0%, rgba(20,13,8,0.92) 42%, rgba(20,13,8,0.1) 60%); }
+    .hero-text { right: calc(46% + 40px); }
+  }
+  .eyebrow { color: var(--gold); font-size: 13px; font-weight: 600; letter-spacing: 4px; text-transform: uppercase; }
+  h1.hero-title {
+    margin: 10px 0 0; color: var(--cream);
+    font-family: 'Playfair Display', Georgia, serif; font-weight: 800;
+    font-size: clamp(30px, 6.5vw, 62px); line-height: 1.08;
+    letter-spacing: 0.5px; text-transform: uppercase;
+  }
+  .hero-title span { color: var(--gold); }
+  .hero-sub { margin-top: 14px; max-width: 46ch; color: #E7DFD3; font-size: 15px; line-height: 1.6; }
+  .hero-facts { margin-top: 22px; display: flex; flex-direction: column; gap: 8px; }
+  .hero-facts div { color: #D8CFC0; font-size: 13.5px; display: flex; gap: 10px; align-items: baseline; }
+  .hero-facts div::before { content: "❄"; color: var(--gold); flex-shrink: 0; }
+  .hero-cta { display: inline-block; margin-top: 26px; background: var(--gold); color: var(--night); text-decoration: none; font-weight: 700; font-size: 13.5px; letter-spacing: 1px; text-transform: uppercase; padding: 15px 30px; border-radius: 2px; }
+  .hero-cta:hover { background: var(--gold-soft); }
+  .hero-disclaimer { position: absolute; left: 24px; bottom: 14px; z-index: 1; font-size: 10.5px; color: rgba(231,223,211,0.55); letter-spacing: 0.2px; }
+
+  /* wavy divider */
+  .wave-divider { position: absolute; left: 0; right: 0; bottom: -1px; line-height: 0; z-index: 1; }
+  .wave-divider svg { width: 100%; height: 70px; display: block; }
+
+  /* hanging star decorations (hero) */
+  .hero-deco { position: absolute; inset: 0; pointer-events: none; z-index: 1; }
+  .deco-star { position: absolute; filter: drop-shadow(0 2px 6px rgba(0,0,0,0.35)); }
+  .deco-star::before { content: ""; position: absolute; left: 50%; bottom: 100%; width: 1px; height: 46px; background: rgba(228,201,137,0.4); }
+  .deco-star svg { width: 100%; height: 100%; display: block; }
+  @media (max-width: 899px) { .hero-deco { display: none; } }
+
+  /* hanging ornament divider */
+  .ornament-divider { display: flex; justify-content: center; align-items: flex-end; gap: 30px; padding: 40px 24px 0; }
+  .orn { position: relative; width: 22px; height: 22px; border-radius: 50%; background: radial-gradient(circle at 32% 28%, rgba(255,255,255,0.55), transparent 42%), var(--c); box-shadow: inset -3px -3px 7px rgba(0,0,0,0.25); }
+  .orn.small { width: 14px; height: 14px; }
+  .orn::before { content: ""; position: absolute; left: 50%; bottom: 100%; width: 1px; height: 28px; background: var(--line); transform: translateX(-50%); }
+
+  .section { padding: 32px 24px 0; }
+  .tagline { color: var(--maroon); font-size: clamp(18px, 3vw, 26px); line-height: 1.5; font-style: italic; margin: 0; font-family: 'Playfair Display', Georgia, serif; }
+  .body-text { color: #3A3F3B; font-size: 16px; line-height: 1.6; margin: 0; }
+
+  /* ---- steps ---- */
+  .steps-head { padding: 44px 24px 6px; text-align: center; }
+  .steps-eyebrow { color: var(--maroon); font-size: 13px; font-weight: 600; letter-spacing: 2px; text-transform: uppercase; }
+  .steps-head h2 { margin: 8px 0 0; font-family: 'Playfair Display', Georgia, serif; font-size: clamp(22px, 4vw, 32px); color: var(--night); }
+  .steps { margin: 28px 24px 0; border: 1px solid var(--line); border-radius: 10px; overflow: hidden; background: #fff; }
+  .step-row { display: flex; align-items: center; gap: 18px; padding: 18px 22px; border-bottom: 1px solid var(--line); }
+  .step-row:last-child { border-bottom: none; }
+  .step-num { font-family: 'Playfair Display', Georgia, serif; font-weight: 800; color: var(--maroon); font-size: 22px; width: 34px; flex-shrink: 0; }
+  .step-title { font-size: 14.5px; color: var(--ink); line-height: 1.4; }
+
+  .why { margin: 40px 24px 0; padding: 26px; background: var(--night); border-radius: 6px; border: 1px solid var(--maroon); }
+  .why-title { color: var(--gold); font-size: 13px; font-weight: 600; letter-spacing: 2px; text-transform: uppercase; }
+  .why-grid { display: grid; grid-template-columns: repeat(2, minmax(0,1fr)); gap: 10px 24px; margin-top: 14px; }
+  .why-grid div { color: #E7DFD3; font-size: 15px; line-height: 1.5; }
+  .label { color: var(--maroon); font-size: 13px; font-weight: 600; letter-spacing: 2px; text-transform: uppercase; }
+  .cards { display: flex; gap: 16px; padding: 16px 24px 0; flex-wrap: wrap; }
+  .card { position: relative; flex: 1 1 260px; background: #fff; border: 1px solid var(--line); border-radius: 6px; padding: 24px; display: flex; flex-direction: column; gap: 14px; }
+  .card .name { font-size: 22px; font-weight: 700; color: var(--night); }
+  .card .price { font-size: 30px; font-weight: 700; color: var(--maroon); }
+  .card hr { border: none; height: 1px; background: var(--line); width: 100%; margin: 0; }
+  .card p { margin: 0; font-size: 14px; line-height: 1.6; color: var(--ink); }
+  .card.premium { background: var(--night); border-color: var(--gold); position: relative; }
+  .card.premium .name, .card.premium p { color: var(--cream); }
+  .card.premium .price { color: var(--gold); }
+  .card.premium hr { background: rgba(250,248,243,0.2); }
+  .badge { position: absolute; top: -13px; left: 20px; background: var(--gold); color: var(--night); font-size: 11px; font-weight: 600; letter-spacing: 1px; text-transform: uppercase; padding: 4px 10px; border-radius: 3px; }
+  .card-cta { margin-top: auto; display: inline-flex; align-items: center; justify-content: center; background: var(--gold); color: var(--night); border: none; cursor: pointer; font-family: inherit; text-decoration: none; font-weight: 700; font-size: 12.5px; letter-spacing: 0.5px; text-transform: uppercase; padding: 12px 16px; border-radius: 4px; text-align: center; }
+  .card-cta:hover { background: var(--gold-soft); }
+  .card.selected { outline: 3px solid var(--maroon); outline-offset: -1px; }
+  .card-cta.selected { background: var(--maroon); color: #fff; }
+  .package-select { margin: 22px 24px 0; padding: 22px 24px; border-radius: 6px; background: var(--night); color: var(--cream); text-align: center; }
+  .package-select p { margin: 0 0 14px; font-size: 15px; }
+  .package-select a.btn-select { display: none; background: var(--gold); color: var(--night); text-decoration: none; font-weight: 700; font-size: 13.5px; letter-spacing: 1px; text-transform: uppercase; padding: 14px 28px; border-radius: 2px; }
+  .package-select a.btn-select:hover { background: var(--gold-soft); }
+  .deposit-note { margin: 22px 24px 0; padding: 20px 24px; border: 1.5px solid var(--gold); border-radius: 6px; background: #fff; font-size: 14px; color: var(--ink); line-height: 1.6; }
+
+  /* ---- calendario (Cal.com) ---- */
+  .calendar-embed { margin: 16px 24px 0; height: 650px; border: 1px solid var(--line); border-radius: 10px; overflow: hidden; background: #fff; }
+  @media (max-width: 500px) { .calendar-embed { height: 720px; } }
+  .deposit-note strong { color: var(--maroon); }
+
+  /* ---- gallery (año pasado) ---- */
+  .gallery-head { padding: 44px 24px 6px; text-align: center; }
+  .gallery-grid { display: grid; grid-template-columns: repeat(4, 1fr); gap: 10px; padding: 24px 24px 0; }
+  .gallery-grid a { display: block; aspect-ratio: 1/1; border-radius: 6px; overflow: hidden; }
+  .gallery-grid img { width: 100%; height: 100%; object-fit: cover; display: block; transition: transform 0.25s ease; }
+  .gallery-grid a:hover img { transform: scale(1.05); }
+  @media (max-width: 700px) { .gallery-grid { grid-template-columns: repeat(2, 1fr); } .gallery-grid a.px { display: none; } }
+  .samples { display: flex; gap: 16px; padding: 16px 24px 0; flex-wrap: wrap; }
+  .sample { flex: 1 1 220px; display: flex; flex-direction: column; gap: 8px; }
+  .sample-photo { width: 100%; height: 220px; border-radius: 6px; overflow: hidden; background: linear-gradient(135deg, #2E1D12, #1B120C); display: flex; align-items: center; justify-content: center; }
+  .sample-photo img { width: 100%; height: 100%; object-fit: cover; display: block; }
+  .sample-photo.no-photo img { display: none; }
+  .sample-photo.no-photo::after { content: attr(data-placeholder); font-size: 12px; font-style: italic; color: var(--gold-soft); text-align: center; padding: 0 18px; }
+  .sample span { text-align: center; font-size: 13px; color: var(--ink); }
+  .mdf-wall { height: 220px; box-sizing: border-box; padding: 22px; border-radius: 6px; background: linear-gradient(180deg, #EFE7D6, #E1D6BC); display: flex; align-items: center; justify-content: center; }
+  .mdf-wall img.mdf-panel { width: auto; height: 100%; aspect-ratio: 1 / 1; object-fit: cover; object-position: 90% 50%; border-radius: 2px; box-shadow: 8px 10px 20px rgba(27,18,12,0.35); }
+  .mdf-wall.no-photo img.mdf-panel { display: none; }
+  .mdf-wall.no-photo::after { content: attr(data-placeholder); font-size: 12px; font-style: italic; color: var(--muted); text-align: center; padding: 0 18px; }
+
+  /* ---- print stack mockup ---- */
+  .print-stack { position: relative; width: 100%; height: 220px; border-radius: 6px; background: linear-gradient(135deg, #EFE7D6, #E1D6BC); display: flex; align-items: center; justify-content: center; overflow: hidden; }
+  .print-photo { position: absolute; width: 112px; background: #fff; padding: 5px 5px 16px; box-shadow: 0 10px 18px rgba(27,18,12,0.35); border-radius: 2px; }
+  .print-photo img { width: 100%; aspect-ratio: 2/3; object-fit: cover; display: block; border-radius: 1px; }
+  .print-photo.back { transform: rotate(-9deg) translate(-20px, 8px); z-index: 1; }
+  .print-photo.front { transform: rotate(7deg) translate(16px, -6px); z-index: 2; }
+  .note { padding: 6px 24px 0; font-size: 12px; font-style: italic; color: #8A8F87; }
+  .extras { padding: 40px 24px 0; }
+  .extras table { width: 100%; border-collapse: collapse; font-size: 14px; }
+  .extras th { text-align: left; font-size: 13px; font-weight: 600; letter-spacing: 1px; text-transform: uppercase; color: var(--night); padding: 0 0 8px; border-bottom: 1px solid var(--line); }
+  .extras td { padding: 10px 0; border-bottom: 1px solid var(--line); color: var(--ink); }
+  .extras td:last-child, .extras th:last-child { text-align: right; white-space: nowrap; padding-left: 12px; }
+  /* ---- faq ---- */
+  .faq-head { padding: 44px 24px 6px; text-align: center; }
+  .faq { margin: 28px 24px 0; border: 1px solid var(--line); border-radius: 10px; overflow: hidden; background: #fff; }
+  .faq-item { border-bottom: 1px solid var(--line); }
+  .faq-item:last-child { border-bottom: none; }
+  .faq-item summary { padding: 18px 22px; cursor: pointer; font-weight: 600; color: var(--night); list-style: none; display: flex; justify-content: space-between; align-items: center; gap: 12px; font-size: 15px; }
+  .faq-item summary::-webkit-details-marker { display: none; }
+  .faq-item summary::after { content: "+"; font-size: 20px; line-height: 1; color: var(--maroon); flex-shrink: 0; }
+  .faq-item[open] summary::after { content: "\2212"; }
+  .faq-item p { margin: 0; padding: 0 22px 18px; font-size: 14px; color: var(--ink); line-height: 1.6; }
+
+  .cta { margin-top: 32px; padding: 30px 24px; background: var(--night); text-align: center; }
+  .cta p { margin: 0; color: var(--gold-soft); font-size: 18px; font-weight: 700; font-family: 'Playfair Display', Georgia, serif; }
+  .cta a.btn { display: inline-block; margin-top: 16px; background: var(--gold); color: var(--night); text-decoration: none; font-weight: 700; font-size: 13.5px; letter-spacing: 1px; text-transform: uppercase; padding: 14px 28px; border-radius: 2px; }
+  .cta a.btn:hover { background: var(--gold-soft); }
+  .contract { padding: 14px 24px 36px; text-align: center; font-size: 12px; letter-spacing: 0.5px; color: var(--muted); }
+
+  @media (min-width: 700px) {
+    .section { padding-left: 64px; padding-right: 64px; }
+    .why { margin-left: 64px; margin-right: 64px; }
+    .steps { margin-left: 64px; margin-right: 64px; }
+    .cards, .samples { padding-left: 64px; padding-right: 64px; }
+    .note, .extras, .contract { padding-left: 64px; padding-right: 64px; }
+    .hero-text { left: 64px; right: 64px; }
+    nav.site-nav { padding-left: 24px; padding-right: 24px; }
+  }
+
+  /* ---- botón flotante WhatsApp ---- */
+  .wa-float { position: fixed; right: 18px; bottom: 18px; z-index: 999; display: flex; align-items: center; gap: 10px; background: #25D366; color: #fff; text-decoration: none; font-weight: 600; font-size: 13.5px; line-height: 1.25; padding: 12px 18px; border-radius: 999px; box-shadow: 0 6px 18px rgba(0,0,0,0.28); max-width: calc(100vw - 36px); }
+  .wa-float:hover { background: #1EBE5B; }
+  .wa-float svg { width: 22px; height: 22px; flex: none; fill: #fff; }
+
+
+  /* ---- fondo navideño oscuro ---- */
+  body { background-color: #12241c; background-image: radial-gradient(rgba(255,255,255,0.07) 1px, transparent 1.5px), radial-gradient(rgba(228,201,137,0.06) 1px, transparent 1.5px); background-size: 46px 46px, 71px 71px; background-position: 0 0, 23px 31px; }
+  .tagline { color: var(--gold-soft); }
+  .body-text { color: #E7DFD3; }
+  .steps-eyebrow, .label { color: var(--gold); }
+  .steps-head h2, .gallery-head h2, .faq-head h2 { color: var(--cream); }
+  .note { color: #B9B3A5; }
+  .extras th { color: var(--cream); border-bottom-color: rgba(250,248,243,0.25); }
+  .extras td { color: #E7DFD3; border-bottom-color: rgba(250,248,243,0.15); }
+  .contract { color: #B9B3A5; }
+  .orn::before { background: rgba(250,248,243,0.35); }
+  .sample span { color: #E7DFD3; }
+  .cta { border-top: 1px solid rgba(201,162,75,0.35); }
+
+
+  /* ---- bordes navideños (guirnaldas con luces) ---- */
+  .gl { position: fixed; pointer-events: none; z-index: 28; }
+  .gl::before, .gl::after { content: ""; position: absolute; inset: 0; background-repeat: repeat; }
+  .gl-top { top: 0; left: 0; right: 0; height: 34px; background: url("data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' width='120' height='34' viewBox='0 0 120 34'><path d='M0,4 Q60,26 120,4' stroke='%231f6b3f' stroke-width='2.4' fill='none'/><path d='M0,4 Q60,26 120,4' stroke='%234fb37c' stroke-width='.9' stroke-dasharray='2 3' fill='none'/></svg>") repeat-x 0 0; }
+  .gl-top::before { background-image: url("data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' width='120' height='34' viewBox='0 0 120 34'><circle cx='15' cy='9' r='8' fill='%23ff5a5a' opacity='.22'/><circle cx='15' cy='9' r='3.2' fill='%23ff5a5a'/><circle cx='14' cy='8' r='1' fill='%23fff' opacity='.8'/><circle cx='75' cy='14' r='8' fill='%23bfe3ff' opacity='.22'/><circle cx='75' cy='14' r='3.2' fill='%23bfe3ff'/><circle cx='74' cy='13' r='1' fill='%23fff' opacity='.8'/></svg>"); background-repeat: repeat-x; animation: glA 2.6s ease-in-out infinite; }
+  .gl-top::after { background-image: url("data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' width='120' height='34' viewBox='0 0 120 34'><circle cx='45' cy='14' r='8' fill='%23ffd36b' opacity='.22'/><circle cx='45' cy='14' r='3.2' fill='%23ffd36b'/><circle cx='44' cy='13' r='1' fill='%23fff' opacity='.8'/><circle cx='105' cy='9' r='8' fill='%235be08c' opacity='.22'/><circle cx='105' cy='9' r='3.2' fill='%235be08c'/><circle cx='104' cy='8' r='1' fill='%23fff' opacity='.8'/></svg>"); background-repeat: repeat-x; animation: glB 2.6s ease-in-out infinite; }
+  .gl-side { top: 34px; bottom: 0; width: 18px; overflow: hidden; background: url("data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' width='34' height='120' viewBox='0 0 34 120'><path d='M4,0 Q30,60 4,120' stroke='%231f6b3f' stroke-width='2.4' fill='none'/><path d='M4,0 Q30,60 4,120' stroke='%234fb37c' stroke-width='.9' stroke-dasharray='2 3' fill='none'/></svg>") repeat-y 0 0 / 34px 120px; }
+  .gl-side::before { background-image: url("data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' width='34' height='120' viewBox='0 0 34 120'><circle cx='10' cy='15' r='8' fill='%23ffd36b' opacity='.22'/><circle cx='10' cy='15' r='3.2' fill='%23ffd36b'/><circle cx='9' cy='14' r='1' fill='%23fff' opacity='.8'/><circle cx='16' cy='75' r='8' fill='%23ff5a5a' opacity='.22'/><circle cx='16' cy='75' r='3.2' fill='%23ff5a5a'/><circle cx='15' cy='74' r='1' fill='%23fff' opacity='.8'/></svg>"); background-repeat: repeat-y; background-size: 34px 120px; animation: glA 2.6s ease-in-out infinite; }
+  .gl-side::after { background-image: url("data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' width='34' height='120' viewBox='0 0 34 120'><circle cx='16' cy='45' r='8' fill='%23bfe3ff' opacity='.22'/><circle cx='16' cy='45' r='3.2' fill='%23bfe3ff'/><circle cx='15' cy='44' r='1' fill='%23fff' opacity='.8'/><circle cx='10' cy='105' r='8' fill='%235be08c' opacity='.22'/><circle cx='10' cy='105' r='3.2' fill='%235be08c'/><circle cx='9' cy='104' r='1' fill='%23fff' opacity='.8'/></svg>"); background-repeat: repeat-y; background-size: 34px 120px; animation: glB 2.6s ease-in-out infinite; }
+  .gl-left { left: 0; }
+  .gl-right { right: 0; transform: scaleX(-1); }
+  @media (min-width: 1200px) { .gl-side { width: 34px; } }
+  @keyframes glA { 0%, 100% { opacity: 1; } 50% { opacity: .25; } }
+  @keyframes glB { 0%, 100% { opacity: .25; } 50% { opacity: 1; } }
+  @media (prefers-reduced-motion: reduce) { .gl::before, .gl::after { animation: none; } }
+
+
+  /* ---- menú: logo grande y centrado ---- */
+  nav.site-nav { flex-direction: column; align-items: center; justify-content: center; gap: 8px; padding: 42px 24px 16px; }
+  .nav-logo { display: block; }
+  .nav-logo img { height: 84px; width: auto; display: block; filter: brightness(0) invert(1); }
+  .nav-home { color: var(--cream); text-decoration: none; font-size: 0.95rem; letter-spacing: 1px; text-transform: uppercase; text-align: center; }
+  .nav-home:hover { color: var(--gold-soft); }
+  @media (max-width: 520px) { .nav-logo img { height: 70px; } .nav-home { font-size: 0.85rem; } }
+
+
+  /* ---- botón de música ---- */
+  .snd-float { position: fixed; left: 44px; bottom: 18px; z-index: 999; width: 48px; height: 48px; border-radius: 50%; border: 1.5px solid var(--gold); background: rgba(18,36,28,0.88); color: var(--gold); display: flex; align-items: center; justify-content: center; cursor: pointer; padding: 0; box-shadow: 0 6px 18px rgba(0,0,0,0.35); -webkit-tap-highlight-color: transparent; }
+  .snd-float:hover { background: rgba(30,56,43,0.95); }
+  .snd-float svg { width: 24px; height: 24px; fill: currentColor; }
+  .snd-float .slash { display: none; stroke: currentColor; stroke-width: 2.4; stroke-linecap: round; }
+  .snd-float.off { color: #b9b3a5; border-color: rgba(185,179,165,0.6); }
+  .snd-float.off .slash { display: block; }
+  .snd-float.off .wave { display: none; }
+  .snd-float.armed::before { content: ""; position: absolute; inset: -5px; border-radius: 50%; border: 2px solid var(--gold); animation: sndPulse 1.8s ease-out infinite; }
+  .snd-float.armed::after { content: "Toca para activar la música"; position: absolute; left: 58px; top: 50%; transform: translateY(-50%); white-space: nowrap; background: rgba(18,36,28,0.92); color: var(--cream); border: 1px solid rgba(201,162,75,0.6); border-radius: 999px; padding: 7px 13px; font-size: 12px; font-weight: 600; }
+  @media (max-width: 700px) { .snd-float { left: 24px; bottom: 78px; } }
+  @keyframes sndPulse { 0% { transform: scale(0.9); opacity: 0.9; } 100% { transform: scale(1.35); opacity: 0; } }
+  @media (prefers-reduced-motion: reduce) { .snd-float.armed::before { animation: none; } }
+
+
+  /* ---- galería completa (modal + visor) ---- */
+  .gm { position: fixed; inset: 0; z-index: 2000; background: rgba(10,18,14,0.97); overflow-y: auto; overscroll-behavior: contain; }
+  .gm[hidden], .lb[hidden] { display: none; }
+  .gm-bar { position: sticky; top: 0; z-index: 1; display: flex; justify-content: space-between; align-items: center; gap: 12px; padding: 12px 18px; background: rgba(10,18,14,0.96); border-bottom: 1px solid rgba(201,162,75,0.3); color: var(--cream); }
+  .gm-title { font-family: 'Playfair Display', Georgia, serif; font-size: 18px; font-weight: 700; }
+  .gm-x { width: 40px; height: 40px; border-radius: 50%; border: 1.5px solid var(--gold); background: transparent; color: var(--gold); font-size: 22px; line-height: 1; cursor: pointer; }
+  .gm-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(190px, 1fr)); gap: 8px; padding: 16px; max-width: 1200px; margin: 0 auto; }
+  .gm-grid button { border: 0; padding: 0; aspect-ratio: 1/1; border-radius: 6px; overflow: hidden; cursor: zoom-in; background: #1b2a22; }
+  .gm-grid img { width: 100%; height: 100%; object-fit: cover; display: block; }
+  @media (max-width: 700px) { .gm-grid { grid-template-columns: repeat(2, 1fr); padding: 10px; gap: 6px; } }
+  .lb { position: fixed; inset: 0; z-index: 2100; background: rgba(0,0,0,0.95); display: flex; align-items: center; justify-content: center; }
+  .lb img { max-width: 96vw; max-height: 86vh; object-fit: contain; border-radius: 4px; }
+  .lb-btn { position: absolute; width: 46px; height: 46px; border-radius: 50%; border: 1.5px solid rgba(250,248,243,0.7); background: rgba(0,0,0,0.45); color: #fff; font-size: 24px; line-height: 1; cursor: pointer; }
+  .lb-x { top: 14px; right: 14px; } .lb-prev { left: 12px; top: 50%; transform: translateY(-50%); } .lb-next { right: 12px; top: 50%; transform: translateY(-50%); }
+  .lb-count { position: absolute; bottom: 14px; left: 0; right: 0; text-align: center; color: #E7DFD3; font-size: 13px; letter-spacing: 1px; }
+
+
+  /* ---- espacio para que la nieve no tape textos ---- */
+  .card .badge { z-index: 25; }
+  .cards { padding-top: 46px; }
+  .samples { padding-top: 44px; }
+  .steps { margin-top: 44px; }
+  .faq { margin-top: 44px; }
+  .why { margin-top: 52px; }
+  .cta { margin-top: 52px; }
+  .deposit-note, .package-select { margin-top: 42px; }
+  .gallery-head { padding-bottom: 36px; }
+  .gallery-grid { padding-top: 10px; }
+  .extras .label { display: block; margin-bottom: 40px; }
+  .extras th { padding-top: 18px; }
+
+  /* ---- nieve ---- */
+  body { position: relative; }
+  #snowFall { position: fixed; inset: 0; width: 100%; height: 100%; pointer-events: none; z-index: 30; }
+  #snowCaps { position: absolute; left: 0; top: 0; width: 100%; overflow: hidden; pointer-events: none; z-index: 20; }
+  #snowCaps svg { position: absolute; overflow: visible; filter: drop-shadow(0 1px 1.2px rgba(27,18,12,0.28)); }
+</style>
 <script async src="https://www.googletagmanager.com/gtag/js?id=G-CBFR2G0DPT"></script>
 <script>
 window.dataLayer = window.dataLayer || [];
@@ -26,65 +321,312 @@ fbq('track', 'PageView');
 <script src="../../capi.js"></script>
 </head>
 <body>
-<header class="site">
-  <div class="nav">
-    <a class="logo" href="../../"><img src="https://res.cloudinary.com/rauzqcoj/image/upload/f_auto,q_auto/LOGO_CAMOTE-06" alt="Camote Weddings"></a>
-    <ul>
-        <li><a href="../../">Inicio</a></li>
-        <li><a href="../../paquetencamotes/">PaquetEncamotes</a></li>
-        <li><a href="../../retoños/">Retoños</a></li>
-        <li><a href="../../save-the-date/">Save the Date</a></li>
-        <li><a href="../../early-christmas/">Minis Navideñas</a></li>
-        <li><a href="../../podcast-en-eventos/">Podcast</a></li>
-        <li><a href="../../galeria-de-bodas-santa-cruz-de-la-sierra/">Galería</a></li>
-        <li><a href="../../sobre-mi/">Sobre mí</a></li>
-        <li><a href="../../blog/">Blog</a></li>
-        <li><a href="../../fotografo-de-bodas-bolivia/">Bodas en Bolivia</a></li>
-    </ul>
-    <a class="btn-wa" href="https://wa.me/59177654396?text=Hola%2C%20quiero%20informaci%C3%B3n%20sobre%20paquetes%20de%20boda" target="_blank" rel="noopener" onclick="trackContact();">WhatsApp</a>
-  </div>
-</header>
-<section style="padding-top:60px;">
-  <div class="container center">
-    <span class="eyebrow">Minis navideñas</span>
-    <h1>¡Tu horario quedó agendado!</h1>
-    <p class="lead" id="resumen">Falta un paso para confirmar tu fecha: el pago de la reserva.</p>
-    <div style="max-width:560px;margin:30px auto;text-align:left;">
-      <p><strong>1. Pide tu QR de pago.</strong> Escríbenos por WhatsApp y te enviamos el código QR con el monto de tu reserva.</p>
-      <p style="text-align:center;"><a class="cta" id="btn-qr" href="#" target="_blank" rel="noopener" onclick="trackContact();">Pedir mi QR por WhatsApp</a></p>
-      <p style="margin-top:28px;"><strong>2. Paga y confirma.</strong> Cuando hayas hecho el pago, pulsa este botón y envíanos tu comprobante para verificar tu reserva.</p>
-      <p style="text-align:center;"><a class="cta outline" id="btn-pago" href="#" target="_blank" rel="noopener" onclick="confirmarPago();" style="background:var(--terracotta);color:#fff">Ya pagué, verificar mi pago</a></p>
-      <p class="fine" style="margin-top:28px;text-align:center;">La reserva se aparta con el 70% del valor del paquete. El 30% restante se paga el día de la sesión.</p>
+
+  <nav class="site-nav">
+    <span class="nav-logo"><img src="https://res.cloudinary.com/rauzqcoj/image/upload/e_trim,f_auto,q_auto,w_400/LOGO_CAMOTE-06" alt="Camote Weddings"></span>
+  </nav>
+
+  <div class="hero">
+    <div class="hero-photo">
+      <img src="../images/hero.jpg" alt="Sesión de Navidad" width="1600" height="1067" decoding="async" fetchpriority="high" onerror="this.closest('.hero-photo').style.display='none'">
+    </div>
+    <div class="hero-text">
+      <div class="eyebrow">¡Reserva agendada!</div>
+      <h1 class="hero-title">Tu horario<br>quedó <span>agendado</span></h1>
+      <p class="hero-sub" id="resumen">Falta un paso para confirmar tu fecha: el pago del anticipo.</p>
+      <div class="hero-facts">
+        <div>Te enviamos el QR de pago por WhatsApp</div>
+        <div>Tu fecha se confirma cuando verificamos el pago</div>
+      </div>
+      <a class="hero-cta" id="btn-qr-hero" href="#" target="_blank" rel="noopener" onclick="trackContact();">Pedir mi QR por WhatsApp</a>
+    </div>
+    <div class="hero-deco" aria-hidden="true">
+      <div class="deco-star" style="top:11%; left:7%; width:46px; height:46px; transform:rotate(-8deg);">
+        <svg viewBox="0 0 100 100"><polygon points="50,4 61,37 97,38 68,59 79,93 50,72 21,93 32,59 3,38 39,37" fill="#C9A24B"/></svg>
+      </div>
+      <div class="deco-star" style="top:7%; left:24%; width:30px; height:30px; transform:rotate(12deg);">
+        <svg viewBox="0 0 100 100"><polygon points="50,4 61,37 97,38 68,59 79,93 50,72 21,93 32,59 3,38 39,37" fill="#E4C989"/></svg>
+      </div>
+      <div class="deco-star" style="top:13%; left:38%; width:22px; height:22px; transform:rotate(4deg);">
+        <svg viewBox="0 0 100 100"><polygon points="50,4 61,37 97,38 68,59 79,93 50,72 21,93 32,59 3,38 39,37" fill="#C9A24B"/></svg>
+      </div>
+    </div>
+    <div class="wave-divider">
+      <svg viewBox="0 0 1440 100" preserveAspectRatio="none"><path d="M0,60 C 240,110 480,0 720,30 C 960,60 1200,110 1440,50 L1440,100 L0,100 Z" fill="#12241c"></path></svg>
     </div>
   </div>
-</section>
-<footer class="site">
-  <p>Fotografía y video de bodas en Santa Cruz de la Sierra, Bolivia</p>
-  <p class="wa"><a href="https://wa.me/59177654396?text=Hola%2C%20quiero%20informaci%C3%B3n%20sobre%20paquetes%20de%20boda" target="_blank" rel="noopener" onclick="trackContact();">+591 77654396 · @CamoteWeddings</a></p>
-  <p class="fine"><a href="mailto:camoteweddings@gmail.com">camoteweddings@gmail.com</a> · <a href="https://www.instagram.com/victorframeph/" target="_blank" rel="noopener">Instagram</a> · <a href="https://www.facebook.com/profile.php?id=61573482047669" target="_blank" rel="noopener">Facebook</a></p>
-  <p class="fine">&copy; Camote Weddings. Todos los derechos reservados.</p>
-</footer>
-<script>
-(function () {
-  var q = new URLSearchParams(location.search);
-  var paquete = q.get('p') || 'Mini Sesión';
-  var precio = parseFloat(q.get('v')) || 0;
-  var orden = q.get('o') || '';
-  var anticipo = Math.round(precio * 0.7);
-  window.__pago = { paquete: paquete, valor: anticipo, orden: orden };
 
-  if (precio) document.getElementById('resumen').textContent =
-    'Reservaste: ' + paquete + '. Para confirmar tu fecha, el anticipo es de Bs ' + anticipo + ' (70% del paquete).';
+  <div class="wrap">
 
-  var wa = 'https://wa.me/59177654396?text=';
-  document.getElementById('btn-qr').href = wa + encodeURIComponent('Hola, agendé la ' + paquete + ' y quiero recibir el QR para pagar mi reserva.');
-  document.getElementById('btn-pago').href = wa + encodeURIComponent('Hola, ya realicé el pago de mi reserva (' + paquete + '). Adjunto mi comprobante.');
-})();
+    <div class="section">
+      <p class="tagline">Ya casi estamos: paga tu anticipo y asegura tu lugar en la sesión.</p>
+    </div>
 
-function confirmarPago() {
-  var p = window.__pago || {};
-  if (typeof trackPurchase === 'function') trackPurchase(p.valor || 0, 'BOB', p.paquete, p.orden);
-}
-</script>
+    <div class="steps-head">
+      <span class="steps-eyebrow">Qué sigue</span>
+      <h2 class="serif">Confirma tu fecha en 2 pasos</h2>
+    </div>
+    <div class="cards">
+      <div class="card">
+        <span class="name serif">1. Pide tu QR de pago</span>
+        <hr>
+        <p>Escríbenos por WhatsApp y te enviamos el código QR con el monto de tu reserva.</p>
+        <a class="card-cta" id="btn-qr" href="#" target="_blank" rel="noopener" onclick="trackContact();">Pedir mi QR por WhatsApp</a>
+      </div>
+      <div class="card premium">
+        <span class="name serif">2. Paga y confirma</span>
+        <hr>
+        <p>Cuando hayas hecho el pago, pulsa el botón y envíanos tu comprobante para verificar tu reserva.</p>
+        <a class="card-cta" id="btn-pago" href="#" target="_blank" rel="noopener" onclick="confirmarPago();">Ya pagué, verificar mi pago</a>
+      </div>
+    </div>
+
+    <div class="deposit-note">
+      <strong>Reserva de fecha:</strong> se aparta con el 70% del valor del paquete elegido. El 30% restante se paga el día de la sesión. Todo el servicio se realiza bajo contrato, para tu tranquilidad y la nuestra.
+    </div>
+
+    <div class="contract">Todo el servicio se realiza bajo contrato.</div>
+
+  </div>
+
+  <script>
+  (function () {
+    var q = new URLSearchParams(location.search);
+    var paquete = q.get('p') || 'Mini Sesión';
+    var precio = parseFloat(q.get('v')) || 0;
+    var orden = q.get('o') || '';
+    var anticipo = Math.round(precio * 0.7);
+    window.__pago = { paquete: paquete, valor: anticipo, orden: orden };
+
+    if (precio) document.getElementById('resumen').textContent =
+      'Reservaste: ' + paquete + '. Para confirmar tu fecha, el anticipo es de Bs ' + anticipo + ' (70% del paquete).';
+
+    var wa = 'https://wa.me/59177654396?text=';
+    var qr = wa + encodeURIComponent('Hola, agendé la ' + paquete + ' y quiero recibir el QR para pagar mi reserva.');
+    document.getElementById('btn-qr').href = qr;
+    document.getElementById('btn-qr-hero').href = qr;
+    document.getElementById('btn-pago').href = wa + encodeURIComponent('Hola, ya realicé el pago de mi reserva (' + paquete + '). Adjunto mi comprobante.');
+  })();
+
+  function confirmarPago() {
+    var p = window.__pago || {};
+    if (typeof trackPurchase === 'function') trackPurchase(p.valor || 0, 'BOB', p.paquete, p.orden);
+  }
+  </script>
+
+  <div class="gl gl-top" aria-hidden="true"></div>
+  <div class="gl gl-side gl-left" aria-hidden="true"></div>
+  <div class="gl gl-side gl-right" aria-hidden="true"></div>
+  <button type="button" class="snd-float" id="sndBtn" aria-label="Silenciar música navideña" aria-pressed="false" title="Música navideña">
+    <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M12 2.5a1.4 1.4 0 0 1 1.4 1.4v.6c2.9.7 4.6 3.100 4.600 6.100v3.200l1.800 2.600c.4.600 0 1.400-.800 1.400H5c-.8 0-1.200-.8-.800-1.400L6 13.800v-3.200c0-3 1.700-5.400 4.600-6.100v-.6A1.400 1.400 0 0 1 12 2.500zM9.800 19.200h4.400a2.200 2.200 0 0 1-4.400 0z"/><path class="wave" d="M2.600 9.800a9.500 9.500 0 0 1 2.200-4.600M21.400 9.800a9.500 9.500 0 0 0-2.200-4.600" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round"/><path class="slash" d="M3.500 3.500l17 17"/></svg>
+  </button>
+  <canvas id="snowFall" aria-hidden="true"></canvas>
+  <div id="snowCaps" aria-hidden="true"></div>
+  <script>
+  (function () {
+    var reduce = window.matchMedia && matchMedia('(prefers-reduced-motion: reduce)').matches;
+
+    /* ---------- nieve acumulada en los bordes ---------- */
+    var TARGETS = '.card, .steps, .deposit-note';
+    var layer = document.getElementById('snowCaps');
+
+    function rng(seed) {
+      return function () {
+        seed |= 0; seed = seed + 0x6D2B79F5 | 0;
+        var t = Math.imul(seed ^ seed >>> 15, 1 | seed);
+        t = t + Math.imul(t ^ t >>> 7, 61 | t) ^ t;
+        return ((t ^ t >>> 14) >>> 0) / 4294967296;
+      };
+    }
+
+    function capSvg(w, seed) {
+      var r = rng(seed * 9301 + 49297);
+      var p1 = r() * 6.28, p2 = r() * 6.28, p3 = r() * 6.28;
+      var base = 4 + r() * 3;
+      var clumps = [], gaps = [], i;
+      var nC = Math.max(2, Math.round(w / 140));
+      for (i = 0; i < nC; i++) clumps.push({ x: r() * w, h: 5 + r() * 10, s: 14 + r() * 34 });
+      var nG = Math.max(1, Math.round(w / 260));
+      for (i = 0; i < nG; i++) gaps.push({ x: r() * w, s: 20 + r() * 50 });
+
+      var step = 5 + r() * 2, xs = [], top = [], bot = [], maxT = 0;
+      for (var x = 0; x <= w + 0.1; x += step) {
+        var t = base + 2.6 * Math.abs(Math.sin(x / 41 + p1)) + 1.6 * Math.sin(x / 15 + p2) + 1.2 * Math.sin(x / 7 + p3) + r() * 1.4;
+        for (i = 0; i < clumps.length; i++) { var d = (x - clumps[i].x) / clumps[i].s; t += clumps[i].h * Math.exp(-d * d); }
+        for (i = 0; i < gaps.length; i++) { var g = (x - gaps[i].x) / gaps[i].s; t *= 1 - 0.8 * Math.exp(-g * g); }
+        var edge = Math.min(x, w - x);
+        if (edge < 12) t *= 0.55 + 0.45 * (edge / 12);
+        t = Math.max(0.8, t);
+        xs.push(Math.min(x, w));
+        top.push(t);
+        bot.push(1 + r() * 3.5 + (r() > 0.93 ? 5 + r() * 7 : 0));
+        if (t > maxT) maxT = t;
+      }
+      var H = Math.ceil(maxT + 16), by = Math.ceil(maxT + 1);
+      var n = xs.length, d1 = 'M' + xs[0] + ',' + (by - top[0] * 0.4);
+      for (i = 1; i < n; i++) {
+        var mx = (xs[i - 1] + xs[i]) / 2, my = by - (top[i - 1] + top[i]) / 2;
+        d1 += 'Q' + xs[i - 1] + ',' + (by - top[i - 1]) + ' ' + mx + ',' + my;
+      }
+      d1 += 'L' + xs[n - 1] + ',' + (by + bot[n - 1] + 4);
+      for (i = n - 1; i > 0; i--) {
+        var bx = (xs[i] + xs[i - 1]) / 2, bY = by + (bot[i] + bot[i - 1]) / 2;
+        d1 += 'Q' + xs[i] + ',' + (by + bot[i]) + ' ' + bx + ',' + bY;
+      }
+      d1 += 'Z';
+      return { d: d1, H: H, by: by };
+    }
+
+    var built = false, timer;
+    function buildCaps() {
+      layer.innerHTML = '';
+      layer.style.height = '0px';
+      var docH = Math.max(document.documentElement.scrollHeight, document.body.scrollHeight);
+      layer.style.height = docH + 'px';
+      var sx = window.pageXOffset || 0, sy = window.pageYOffset || 0;
+      var nodes = document.querySelectorAll(TARGETS), idx = 0, html = '';
+      for (var k = 0; k < nodes.length; k++) {
+        var el = nodes[k], rc = el.getBoundingClientRect();
+        if (rc.width < 90 || rc.height < 30) continue;
+        if (el.closest('.hero')) continue;
+        var cs = getComputedStyle(el);
+        if (cs.display === 'none' || cs.visibility === 'hidden') continue;
+        idx++;
+        var s = capSvg(rc.width, idx + Math.round(rc.width));
+        html += '<svg width="' + rc.width + '" height="' + s.H + '" viewBox="0 0 ' + rc.width + ' ' + s.H + '" style="left:' + (rc.left + sx) + 'px;top:' + (rc.top + sy - s.by) + 'px"><path d="' + s.d + '" fill="#fff"/></svg>';
+      }
+      layer.innerHTML = html;
+      built = true;
+    }
+    function scheduleBuild() { clearTimeout(timer); timer = setTimeout(buildCaps, 120); }
+
+    window.addEventListener('load', buildCaps);
+    window.addEventListener('resize', scheduleBuild);
+    if (document.fonts && document.fonts.ready) document.fonts.ready.then(scheduleBuild);
+    if (window.ResizeObserver) new ResizeObserver(scheduleBuild).observe(document.body);
+    buildCaps();
+
+    /* ---------- copos que caen al deslizar ---------- */
+    if (reduce) return;
+    var cv = document.getElementById('snowFall'), cx = cv.getContext('2d');
+    var W = 0, Hh = 0, dpr = Math.min(window.devicePixelRatio || 1, 2), flakes = [];
+    function size() {
+      W = window.innerWidth; Hh = window.innerHeight;
+      cv.width = W * dpr; cv.height = Hh * dpr;
+      cx.setTransform(dpr, 0, 0, dpr, 0, 0);
+      var count = Math.round(Math.min(110, Math.max(40, W / 11)));
+      while (flakes.length < count) flakes.push(mk(true));
+      flakes.length = count;
+    }
+    function mk(any) {
+      var z = Math.random();
+      return { x: Math.random() * W, y: any ? Math.random() * Hh : -10, r: 0.8 + z * 2.6, v: 0.25 + z * 0.9, ph: Math.random() * 6.28, sw: 0.3 + Math.random() * 0.9, a: 0.45 + z * 0.5, vx: 0, vy: 0 };
+    }
+    var lastY = window.pageYOffset, boost = 0, gust = 0, running = true, last = performance.now();
+    window.addEventListener('scroll', function () {
+      var y = window.pageYOffset, dy = y - lastY; lastY = y;
+      if (dy >= 0) return;
+      var k = Math.min(1, 0.35 + Math.abs(dy) / 40);
+      gust = Math.min(gust + Math.abs(dy) * 0.05, 4);
+      for (var i = 0; i < flakes.length; i++) {
+        var f = flakes[i], a = Math.random() * 6.2832, m = (3 + Math.random() * 7) * 0.5 * k * (0.6 + f.r / 3);
+        f.vx = Math.max(-11, Math.min(11, f.vx + Math.cos(a) * m));
+        f.vy = Math.max(-11, Math.min(11, f.vy + Math.sin(a) * m - 0.75 * k));
+      }
+    }, { passive: true });
+    document.addEventListener('visibilitychange', function () { running = !document.hidden; if (running) { last = performance.now(); requestAnimationFrame(tick); } });
+    window.addEventListener('resize', size);
+    size();
+
+    function tick(now) {
+      if (!running) return;
+      var dt = Math.min((now - last) / 16.7, 3); last = now;
+      boost *= Math.pow(0.94, dt);
+      gust *= Math.pow(0.95, dt);
+      cx.clearRect(0, 0, W, Hh);
+      cx.fillStyle = '#fff';
+      cx.shadowColor = 'rgba(70,80,100,0.6)'; cx.shadowBlur = 3;
+      var speedMul = 0.55 + boost;
+      for (var i = 0; i < flakes.length; i++) {
+        var f = flakes[i];
+        f.ph += 0.02 * f.sw * dt;
+        var fr = Math.pow(0.965, dt);
+        f.vx *= fr; f.vy *= fr;
+        if (gust > 0.4) { f.vx += Math.sin(f.ph * 4 + f.y / 55) * gust * 0.06 * dt; f.vy += Math.cos(f.ph * 3 + f.x / 70) * gust * 0.05 * dt; }
+        f.y += f.v * speedMul * dt * 1.6 + f.vy * dt;
+        f.x += Math.sin(f.ph) * 0.5 * dt + 0.15 * dt + f.vx * dt;
+        if (f.x < -20) f.x = W + 20; else if (f.x > W + 20) f.x = -20;
+        if (f.y < -20) f.y = Hh + 10;
+        if (f.y > Hh + 10) { var n = mk(false); f.x = Math.random() * W; f.y = -10; f.r = n.r; f.v = n.v; f.a = n.a; f.vx = 0; f.vy = 0; }
+        cx.globalAlpha = f.a;
+        cx.beginPath(); cx.arc(f.x, f.y, f.r, 0, 6.2832); cx.fill();
+      }
+      cx.globalAlpha = 1;
+      requestAnimationFrame(tick);
+    }
+    requestAnimationFrame(tick);
+  })();
+  </script>
+
+  <script>
+  (function () {
+    var KEY = 'camote_xmas_muted', muted = false;
+    try { muted = localStorage.getItem(KEY) === '1'; } catch (e) {}
+    var btn = document.getElementById('sndBtn');
+
+    /* bucle de cascabeles (grabación CC0: "Sleigh bells" de The Midnite Wolf, Wikimedia Commons) */
+    var audio = new Audio('../audio/cascabeles.wav');
+    audio.loop = true; audio.preload = 'none'; audio.volume = 0;
+    var playing = false, fadeT;
+
+    function fade(to, ms, done) {
+      clearInterval(fadeT);
+      var from = audio.volume, t0 = Date.now();
+      fadeT = setInterval(function () {
+        var k = Math.min(1, (Date.now() - t0) / ms);
+        audio.volume = from + (to - from) * k;
+        if (k >= 1) { clearInterval(fadeT); if (done) done(); }
+      }, 40);
+    }
+    function paint() {
+      btn.classList.toggle('off', muted);
+      btn.classList.toggle('armed', !muted && !playing);
+      btn.setAttribute('aria-pressed', muted ? 'true' : 'false');
+      btn.setAttribute('aria-label', muted ? 'Activar música navideña' : (playing ? 'Silenciar música navideña' : 'Activar música navideña'));
+    }
+    var starting = false;
+    function tryStart() {
+      if (muted || playing || starting) return;
+      starting = true;
+      var p = audio.play();
+      if (p && p.then) {
+        p.then(function () { starting = false; playing = true; fade(1, 1500); paint(); })
+         .catch(function () { setTimeout(function () { starting = false; }, 300); paint(); });
+      } else { starting = false; playing = true; paint(); }
+    }
+    function halt() {
+      playing = false;
+      fade(0, 300, function () { audio.pause(); });
+      paint();
+    }
+    btn.addEventListener('click', function () {
+      if (!muted && !playing) { tryStart(); return; }
+      muted = !muted;
+      try { localStorage.setItem(KEY, muted ? '1' : '0'); } catch (e) {}
+      if (muted) halt(); else { paint(); tryStart(); }
+    });
+    ['pointerdown', 'pointerup', 'touchstart', 'touchend', 'keydown', 'click', 'wheel', 'scroll'].forEach(function (ev) {
+      window.addEventListener(ev, tryStart, { capture: true, passive: true });
+    });
+    window.addEventListener('load', tryStart);
+    window.addEventListener('pageshow', tryStart);
+    document.addEventListener('visibilitychange', function () {
+      if (document.hidden) { if (playing) audio.pause(); }
+      else if (playing) audio.play().catch(function () {});
+    });
+    paint();
+    tryStart();
+  })();
+  </script>
 </body>
 </html>
