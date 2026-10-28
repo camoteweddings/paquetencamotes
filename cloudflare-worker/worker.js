@@ -3,9 +3,11 @@
 // además de disparar el Pixel normal — así el mismo evento llega por dos caminos y Meta los
 // deduplica automáticamente usando el mismo event_id.
 //
-// También recibe el webhook de Cal.com (POST /cal-webhook): cuando alguien agenda (BOOKING_CREATED)
-// agrega sus datos, con hash SHA-256, a una audiencia personalizada de Meta ("Personas que agendaron")
-// para poder crear audiencias similares.
+// También recibe el webhook de Cal.com (POST /cal-webhook): cuando alguien agenda (BOOKING_CREATED, o
+// BOOKING_REQUESTED en eventos que requieren confirmación) agrega sus datos, con hash SHA-256, a una
+// audiencia personalizada de Meta ("Personas que agendaron") para poder crear audiencias similares.
+// Además guarda el uid de la reserva en el KV "BOOKINGS"; la página de gracias lo consulta con
+// GET /booking?uid=... para mostrarse solo a quienes ya reservaron.
 //
 // Variables de entorno necesarias (configurar en el dashboard de Cloudflare, no en este archivo):
 //   PIXEL_ID            -> "1608878456861993" (el dataset/pixel de Camote Weddings)
@@ -18,6 +20,7 @@
 //   ALLOWED_EVENT_SLUGS  -> tipos de evento de Cal que cuentan, separados por coma (no secreto)
 //   META_AUDIENCE_NAME   -> (opcional) nombre de la audiencia, por defecto "Personas que agendaron"
 //   META_AUDIENCE_ID     -> (opcional) id de una audiencia ya creada, para no buscarla por nombre
+//   BOOKINGS (KV)        -> namespace de Workers KV con las reservas (binding en wrangler.toml)
 // El token del webhook necesita permisos ads_management y business_management.
 
 const GRAPH = "https://graph.facebook.com/v21.0";
@@ -150,7 +153,8 @@ async function handleCalWebhook(request, env) {
   }
 
   // La prueba de ping de Cal y cualquier otro disparador se aceptan sin hacer nada.
-  if (event.triggerEvent !== "BOOKING_CREATED") {
+  // Los eventos "Requiere confirmación" (minis) llegan como BOOKING_REQUESTED, no como BOOKING_CREATED.
+  if (event.triggerEvent !== "BOOKING_CREATED" && event.triggerEvent !== "BOOKING_REQUESTED") {
     return new Response(JSON.stringify({ ok: true, ignored: event.triggerEvent || null }), {
       headers: { "Content-Type": "application/json" },
     });
@@ -167,6 +171,17 @@ async function handleCalWebhook(request, env) {
     return new Response(JSON.stringify({ ok: true, ignored: "slug", slug }), {
       headers: { "Content-Type": "application/json" },
     });
+  }
+
+  // Registro de la reserva: la página de gracias solo se muestra si este uid existe (ver /booking).
+  if (env.BOOKINGS && payload.uid) {
+    try {
+      await env.BOOKINGS.put(`booking:${payload.uid}`, JSON.stringify({ slug, ts: Date.now() }), {
+        expirationTtl: 60 * 60 * 24 * 45,
+      });
+    } catch (e) {
+      console.error("cal-webhook: no se pudo guardar la reserva en KV:", String(e?.message || e));
+    }
   }
 
   const attendees = (payload.attendees || []).filter((a) => a && (a.email || a.name));
@@ -210,8 +225,33 @@ function safeCustomData(cd) {
   return Object.keys(out).length ? out : null;
 }
 
+// GET /booking?uid=... : confirma que existe una reserva con ese uid (la crea el webhook de Cal).
+async function handleBookingCheck(request, env) {
+  const headers = {
+    "Access-Control-Allow-Origin": env.ALLOWED_ORIGIN || "https://camoteweddings.com",
+    "Access-Control-Allow-Methods": "GET, OPTIONS",
+    "Content-Type": "application/json",
+    "Cache-Control": "no-store",
+  };
+  if (request.method === "OPTIONS") return new Response(null, { headers });
+  if (request.method !== "GET") return new Response("Method Not Allowed", { status: 405, headers });
+
+  const uid = new URL(request.url).searchParams.get("uid") || "";
+  if (!env.BOOKINGS || !/^[A-Za-z0-9_-]{8,64}$/.test(uid)) {
+    return new Response(JSON.stringify({ ok: false }), { status: 404, headers });
+  }
+  const found = await env.BOOKINGS.get(`booking:${uid}`);
+  if (!found) return new Response(JSON.stringify({ ok: false }), { status: 404, headers });
+  let slug = "";
+  try { slug = JSON.parse(found).slug || ""; } catch (e) {}
+  return new Response(JSON.stringify({ ok: true, slug }), { headers });
+}
+
 export default {
   async fetch(request, env) {
+    if (new URL(request.url).pathname === "/booking") {
+      return handleBookingCheck(request, env);
+    }
     if (new URL(request.url).pathname === "/cal-webhook") {
       if (request.method !== "POST") return new Response("Method Not Allowed", { status: 405 });
       return handleCalWebhook(request, env);

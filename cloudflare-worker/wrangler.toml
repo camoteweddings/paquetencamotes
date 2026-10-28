@@ -17,6 +17,11 @@ ALLOWED_EVENT_SLUGS = "save-the-date,minis-navidenas,minis-navidenas-45-min"
 # Secretos del webhook (no van en este archivo):
 #   wrangler secret put CAL_WEBHOOK_SECRET
 
+# Reservas de Cal: las guarda /cal-webhook y las consulta GET /booking (página de gracias).
+[[kv_namespaces]]
+binding = "BOOKINGS"
+id = "c203bbd68d9349a99e4ab3a87ac91e6a"
+
 # El token de acceso NO va en este archivo por seguridad.
 # Se configura como secreto con:
 #   wrangler secret put META_ACCESS_TOKEN
