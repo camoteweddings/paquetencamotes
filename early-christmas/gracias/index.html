@@ -349,12 +349,14 @@ fbq('track', 'PageView');
 
   <div id="verificando" class="gate-msg">
     <p class="serif">Verificando tu reserva…</p>
+    <p>Esto puede tardar unos segundos. No cierres esta página.</p>
   </div>
 
   <div id="sin-reserva" class="gate-msg" hidden>
     <p class="serif">Esta página es solo para quienes ya reservaron su fecha.</p>
     <p>Si acabas de reservar y no ves tu reserva, escríbenos por WhatsApp y te ayudamos.</p>
     <a class="hero-cta" href="https://wa.me/59177654396?text=Hola%2C%20acabo%20de%20reservar%20mi%20sesi%C3%B3n%20navide%C3%B1a%20y%20necesito%20mi%20QR%20de%20pago." target="_blank" rel="noopener">Escribir por WhatsApp</a>
+    <a class="gate-back" href="" onclick="location.reload(); return false;">Reintentar ahora</a>
     <a class="gate-back" href="../">Ver las minis navideñas</a>
   </div>
 
@@ -453,16 +455,17 @@ fbq('track', 'PageView');
 
     if (!/^[A-Za-z0-9_-]{8,64}$/.test(orden)) { location.replace('../'); return; }
 
-    var intentos = 0;
+    // Cal avisa al Worker por webhook y a veces tarda; se espera hasta ~100 s antes de rendirse.
+    var intentos = 0, MAX = 40, PAUSA = 2500;
     (function verificar() {
-      fetch(API + '/booking?uid=' + encodeURIComponent(orden))
+      fetch(API + '/booking?uid=' + encodeURIComponent(orden) + '&_=' + Date.now())
         .then(function (r) { return r.ok ? r.json() : null; })
         .then(function (d) {
           if (d && d.ok) return mostrar(d.slug);
-          if (++intentos < 8) return setTimeout(verificar, 1500);   // el webhook de Cal puede tardar unos segundos
+          if (++intentos < MAX) return setTimeout(verificar, PAUSA);
           rechazar();
         })
-        .catch(function () { if (++intentos < 8) setTimeout(verificar, 1500); else rechazar(); });
+        .catch(function () { if (++intentos < MAX) setTimeout(verificar, PAUSA); else rechazar(); });
     })();
 
     /* ---- comprobante ---- */
