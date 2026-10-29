@@ -240,3 +240,8 @@ footer.site .fine{font-size:.75rem;}
 .hero h1{margin-bottom:10px;}
 .hero p{margin-bottom:0;}
 }
+.sec-head::after{background:linear-gradient(to bottom,rgba(18,12,9,.12),rgba(18,12,9,.38));}
+.sec-head-txt{justify-content:flex-end;padding-bottom:5%;}
+.sec-head-txt h2{font-size:clamp(1.15rem,3.4vw,2.8rem);letter-spacing:.5px;text-shadow:0 2px 18px rgba(0,0,0,.55);}
+.sec-head-txt .eyebrow{text-shadow:0 1px 10px rgba(0,0,0,.6);color:#fff;}
+@media(max-width:600px){.sec-head-txt{padding-bottom:6%;}}
