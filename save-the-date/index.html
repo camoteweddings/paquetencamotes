@@ -46,18 +46,8 @@ fbq('track', 'PageView');
 <header class="site">
   <div class="nav">
     <a class="logo" href="../"><img src="https://res.cloudinary.com/rauzqcoj/image/upload/f_auto,q_auto/LOGO_CAMOTE-06" alt="Camote Weddings"></a>
-    <ul>
-        <li><a href="../">Inicio</a></li>
-        <li><a href="../paquetencamotes/">PaquetEncamotes</a></li>
-        <li><a href="../retoños/">Retoños</a></li>
-        <li><a href="../save-the-date/" style="color:var(--terracotta)">Save the Date</a></li>
-        <li><a href="../early-christmas/">Minis Navideñas</a></li>
-        <li><a href="../podcast-en-eventos/">Podcast</a></li>
-        <li><a href="../galeria-de-bodas-santa-cruz-de-la-sierra/">Galería</a></li>
-        <li><a href="../sobre-mi/">Sobre mí</a></li>
-        <li><a href="../blog/">Blog</a></li>
-        <li><a href="../fotografo-de-bodas-bolivia/">Bodas en Bolivia</a></li>
-    </ul>
+    <ul id="menu"><li><a href="../">Inicio</a></li><li class="has-sub on"><button type="button" class="sub-btn" aria-expanded="false" onclick="this.parentNode.classList.toggle('open');this.setAttribute('aria-expanded',this.parentNode.classList.contains('open'))">Servicios <span aria-hidden="true">▾</span></button><ul class="sub"><li><a href="../paquetencamotes/">PaquetEncamotes</a></li><li><a href="../retoños/">Retoños</a></li><li><a class="on" href="../save-the-date/">Save the Date</a></li><li><a href="../early-christmas/">Minis Navideñas</a></li><li><a href="../podcast-en-eventos/">Podcast</a></li></ul></li><li><a href="../galeria-de-bodas-santa-cruz-de-la-sierra/">Galería</a></li><li class="has-sub"><button type="button" class="sub-btn" aria-expanded="false" onclick="this.parentNode.classList.toggle('open');this.setAttribute('aria-expanded',this.parentNode.classList.contains('open'))">Nosotros <span aria-hidden="true">▾</span></button><ul class="sub"><li><a href="../sobre-mi/">Sobre mí</a></li><li><a href="../blog/">Blog</a></li><li><a href="../fotografo-de-bodas-bolivia/">Bodas en Bolivia</a></li></ul></li></ul>
+    <button type="button" class="burger" aria-label="Menú" aria-controls="menu" onclick="document.getElementById('menu').classList.toggle('show')"><span></span><span></span><span></span></button>
     <a class="btn-wa" href="https://wa.me/59177654396?text=Hola%2C%20quiero%20informaci%C3%B3n%20sobre%20paquetes%20de%20boda" target="_blank" rel="noopener" onclick="trackContact();">WhatsApp</a>
   </div>
 </header>
