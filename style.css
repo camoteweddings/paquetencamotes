@@ -146,3 +146,12 @@ section.alt{background:#f3e9db;}
 .promo-vid .pv-s{top:63%;font-size:clamp(.6rem,2.2vw,.9rem);letter-spacing:.35em;padding:7px 18px;border:1px solid rgba(255,255,255,.8);border-radius:999px;}
 .promo-vid .live{top:12px;display:inline-flex;align-items:center;gap:8px;background:#16301f;padding:6px 14px;border-radius:999px;font-size:.7rem;letter-spacing:.2em;}
 .promo-vid .live i{width:9px;height:9px;border-radius:50%;background:#e0402b;display:block;}
+.bg-photo .grp{text-align:center;font-size:1.5rem;margin-top:44px;color:#fff;letter-spacing:2px;text-transform:uppercase;}
+.bg-photo .grp + .pkg-grid{margin-top:20px;}
+.pkg{overflow:hidden;}
+.pkg-img{width:calc(100% + 52px);margin:-32px -26px 18px;aspect-ratio:4/3;object-fit:cover;max-width:none;}
+.pkg .cat{display:block;font-size:.72rem;letter-spacing:2px;text-transform:uppercase;color:#f0cfa9;margin-bottom:6px;}
+.pkg .price small{display:block;font-size:.7rem;letter-spacing:2px;text-transform:uppercase;opacity:.85;margin-bottom:2px;}
+.bg-plain .closing{text-align:center;padding:10px 0 60px;color:#fff;}
+.bg-plain .closing h2{margin-bottom:10px;}
+.bg-plain .closing p{margin-bottom:20px;}
