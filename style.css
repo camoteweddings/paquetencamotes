@@ -231,13 +231,11 @@ footer.site .fine{font-size:.75rem;}
 }
 .hero-bg-slide{background-position:center 0%;}
 @media(max-width:700px){
-.hero{display:block;min-height:0;background:#1d1510;}
-.hero-bg{position:relative;inset:auto;height:auto;aspect-ratio:4/3;}
-.hero-bg::after{background:rgba(30,20,15,.12);}
-.hero-bg::before{content:"";position:absolute;left:0;right:0;top:0;height:120px;background:linear-gradient(rgba(0,0,0,.55),transparent);z-index:2;}
-.hero-bg-slide{background-position:center center;}
-.hero-content{padding:26px 20px 34px;max-width:none;}
-.hero h1{margin-bottom:10px;}
+.hero{min-height:82svh;min-height:82vh;}
+.hero-bg::after{background:rgba(30,20,15,.5);}
+.hero-bg-slide{background-position:center 20%;}
+.hero-content{padding:20px 22px;}
+.hero h1{margin-bottom:12px;text-shadow:0 2px 16px rgba(0,0,0,.5);}
 .hero p{margin-bottom:0;}
 }
 .sec-head::after{background:linear-gradient(to bottom,rgba(18,12,9,.12),rgba(18,12,9,.38));}
