@@ -3,9 +3,16 @@
   if(h){
     var nx=h.nextElementSibling;
     if(nx&&nx.classList.contains('hero'))h.classList.add('over-hero');
+    var last=window.pageYOffset;
     var upd=function(){
-      var open=document.getElementById('menu')&&document.getElementById('menu').classList.contains('show');
-      h.classList.toggle('solid',window.pageYOffset>20||open);
+      var y=window.pageYOffset;
+      var menu=document.getElementById('menu');
+      var open=menu&&menu.classList.contains('show');
+      var sub=h.querySelector('.has-sub.open');
+      h.classList.toggle('solid',y>20||open);
+      if(y<=20||open||sub||y<last-4)h.classList.remove('nav-hidden');
+      else if(y>last+4)h.classList.add('nav-hidden');
+      last=y;
     };
     window.addEventListener('scroll',upd,{passive:true});
     var b=h.querySelector('.burger');

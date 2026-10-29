@@ -204,3 +204,5 @@ body{top:0 !important;}
 .sec-head-txt{position:absolute;inset:0;z-index:2;display:flex;flex-direction:column;align-items:center;justify-content:center;text-align:center;padding:0 16px;}
 .sec-head-txt .eyebrow{font-size:clamp(.55rem,1.5vw,.8rem);margin-bottom:6px;color:#f0cfa9;}
 .sec-head-txt h2{font-size:clamp(1.05rem,3.6vw,2.4rem);line-height:1.2;color:#fff;text-shadow:0 2px 14px rgba(0,0,0,.5);}
+header.site{transition:background .3s ease,box-shadow .3s ease,transform .3s ease;}
+header.site.nav-hidden{transform:translateY(-110%);}
