@@ -129,3 +129,7 @@ section.alt{background:#f3e9db;}
 .bg-photo .pkg.featured{border-color:#f0cfa9;box-shadow:0 8px 28px rgba(0,0,0,.35);}
 .bg-photo table th,.bg-photo table td,.bg-photo caption{color:#fff;}
 .bg-photo table tr{border-color:rgba(255,255,255,.35) !important;}
+.bg-photo-2{background-image:url(https://res.cloudinary.com/rauzqcoj/image/upload/f_auto,q_auto,c_crop,w_2560,h_672,g_xy_center,x_1280,y_700/c_limit,w_2000/v1787801572/home-fondo-boda-18.jpg);}
+.bg-plain{background-image:none;}
+.bg-plain::before{background:none;}
+.bg-plain .tbl{margin-top:0 !important;}
