@@ -255,3 +255,15 @@ footer.site .fine{font-size:.75rem;}
 .gal-wrap .gallery-grid .ph{display:block;flex:none;overflow:hidden;}
 .gal-wrap .gallery-grid .ph img{width:100%;height:auto;display:block;border-radius:0;}
 @media(max-width:600px){.gal-head{padding:32px 16px 20px;}.gal-wrap{padding:0 0 32px;}}
+
+/* Inicio: foto de portada completa */
+.hero-bg.full{background:#1d1510;}
+.hero-bg.full::before{content:"";position:absolute;inset:-30px;background:var(--img) center/cover no-repeat;filter:blur(28px) brightness(.75);z-index:0;}
+.hero-bg.full img{position:absolute;left:50%;top:0;height:100%;width:auto;max-width:100%;transform:translateX(-50%);object-fit:contain;z-index:0;}
+.hero:has(.hero-bg.full){min-height:min(92vh,900px);}
+@media(max-width:700px){.hero:has(.hero-bg.full){display:block;min-height:0;background:#1d1510;}.hero-bg.full{position:relative;inset:auto;aspect-ratio:3/2;height:auto;}.hero-bg.full::before{display:none;}.hero-bg.full::after{background:rgba(30,20,15,.1);}.hero-bg.full img{width:100%;height:100%;}.hero:has(.hero-bg.full) .hero-content{padding:26px 22px 34px;}}
+.eyebrow{font-size:clamp(.68rem,2.2vw,.8rem);}
+h2{font-size:clamp(1.45rem,4.6vw,2.2rem);line-height:1.25;}
+.lead{font-size:clamp(.95rem,2.8vw,1.1rem);line-height:1.65;padding:0 4px;}
+.cta{font-size:clamp(.78rem,2.6vw,.9rem);padding:clamp(11px,3vw,14px) clamp(22px,6vw,32px);}
+@media(max-width:600px){section{padding:48px 0;}.hero h1{font-size:1.6rem;}.hero-content p{font-size:.95rem;}}
