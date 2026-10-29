@@ -23,7 +23,7 @@
 <script type="application/ld+json">{"@context":"https://schema.org","@type":["LocalBusiness","Organization"],"name":"Camote Weddings","url":"https://camoteweddings.com","email":"camoteweddings@gmail.com","address":{"@type":"PostalAddress","addressLocality":"santa cruz","addressRegion":"Santa Cruz de la Sierra","addressCountry":"BO"},"areaServed":[{"@type":"City","name":"Santa Cruz de la Sierra"},{"@type":"City","name":"La Paz"},{"@type":"City","name":"Cochabamba"},{"@type":"City","name":"Sucre"},{"@type":"City","name":"Oruro"},{"@type":"City","name":"Potosí"},{"@type":"City","name":"Tarija"},{"@type":"City","name":"Trinidad"},{"@type":"City","name":"Cobija"},{"@type":"Country","name":"Bolivia"}],"priceRange":"Bs 4.000 - Bs 8.800","description":"Camote Weddings es una empresa de fotografía especializada en bodas en Santa Cruz, Bolivia. Cobertura completa del día de la boda con un enfoque documental, emotivo y natural.","telephone":"+59177654396","sameAs":["https://www.instagram.com/victorframeph/","https://www.facebook.com/profile.php?id=61573482047669","https://victorframe.com/"]}</script>
 <link rel="icon" type="image/png" sizes="180x180" href="https://res.cloudinary.com/rauzqcoj/image/upload/c_pad,b_white,w_180,h_180,f_png/LOGO_CAMOTE-06">
 <link rel="shortcut icon" href="/favicon.ico">
-<link rel="stylesheet" href="../style.css?v=37">
+<link rel="stylesheet" href="../style.css?v=38">
 <script async src="https://www.googletagmanager.com/gtag/js?id=G-CBFR2G0DPT"></script>
 <script>
 window.dataLayer = window.dataLayer || [];
@@ -102,6 +102,24 @@ fbq('track', 'PageView');
       <a class="ph" style="--r:1.499" href="https://res.cloudinary.com/rauzqcoj/image/upload/f_auto,q_auto/VFR_0199" target="_blank" rel="noopener"><img src="https://res.cloudinary.com/rauzqcoj/image/upload/f_auto,q_auto,c_limit,w_900/VFR_0199" loading="lazy" alt="Ceremonia de boda en Santa Cruz de la Sierra - Camote Weddings"></a>
     </div>
 </section>
+<script>(function(){
+var g=document.querySelector('.gallery-grid');
+var items=[].slice.call(g.querySelectorAll('.ph'));
+items.forEach(function(a,i){a.setAttribute('data-i',i);});
+var mq=window.matchMedia('(max-width:600px)'),n=0;
+function build(){
+var c=mq.matches?1:2;if(c===n)return;n=c;
+var cols=[],h=[];
+for(var k=0;k<c;k++){var d=document.createElement('div');d.className='gal-col';cols.push(d);h.push(0);}
+items.forEach(function(a){
+var m=0;for(var k=1;k<c;k++){if(h[k]<h[m])m=k;}
+cols[m].appendChild(a);h[m]+=1/parseFloat(a.style.getPropertyValue('--r'));
+});
+g.innerHTML='';cols.forEach(function(d){g.appendChild(d);});
+}
+build();
+if(mq.addEventListener)mq.addEventListener('change',build);else mq.addListener(build);
+})();</script>
 <div class="lightbox-overlay" id="gallery-lightbox">
 <button class="lightbox-arrow lightbox-prev" aria-label="Anterior"><svg viewBox="0 0 24 24"><polyline points="15 18 9 12 15 6"></polyline></svg></button>
 <img id="gallery-lightbox-img" src="" alt="Boda Santa Cruz de la Sierra - Camote Weddings">
@@ -118,7 +136,7 @@ var overlay = document.getElementById('gallery-lightbox');
 var imgEl = document.getElementById('gallery-lightbox-img');
 var prevBtn = overlay.querySelector('.lightbox-prev');
 var nextBtn = overlay.querySelector('.lightbox-next');
-var links = Array.prototype.slice.call(document.querySelectorAll('.gallery-grid .ph'));
+var links = Array.prototype.slice.call(document.querySelectorAll('.gallery-grid .ph')).sort(function(a,b){return a.getAttribute('data-i')-b.getAttribute('data-i');});
 var urls = links.map(function(a){ return a.getAttribute('href'); });
 var current = 0;
 var wasSwipe = false;
