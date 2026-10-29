@@ -133,3 +133,8 @@ section.alt{background:#f3e9db;}
 .bg-plain{background-image:none;}
 .bg-plain::before{background:none;}
 .bg-plain .tbl{margin-top:0 !important;}
+.promo{margin-top:44px;padding:34px 28px;text-align:center;border-radius:12px;background:rgba(255,255,255,.2);border:1px solid rgba(240,207,169,.6);-webkit-backdrop-filter:blur(6px);backdrop-filter:blur(6px);color:#fff;}
+.promo .eyebrow{color:#f0cfa9;}
+.promo h3{font-size:1.5rem;margin:4px 0 12px;color:#fff;}
+.promo p{max-width:640px;margin:0 auto 20px;font-size:.98rem;}
+.promo .cta{display:inline-block;width:auto;}
