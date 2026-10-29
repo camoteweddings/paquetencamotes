@@ -245,3 +245,14 @@ footer.site .fine{font-size:.75rem;}
 .sec-head-txt h2{font-size:clamp(1.15rem,3.4vw,2.8rem);letter-spacing:.5px;text-shadow:0 2px 18px rgba(0,0,0,.55);}
 .sec-head-txt .eyebrow{text-shadow:0 1px 10px rgba(0,0,0,.6);color:#fff;}
 @media(max-width:600px){.sec-head-txt{padding-bottom:6%;}}
+
+/* Galería estilo portafolio (masonry) */
+.gal-head{text-align:center;padding:48px 20px 28px;}
+.gal-head h1{font-size:clamp(1.5rem,3.4vw,2.4rem);margin-bottom:10px;}
+.gal-head p{opacity:.8;}
+.gal-wrap{padding:0 6px 40px;max-width:none;}
+.gal-wrap .gallery-grid{display:block;column-count:3;column-gap:6px;}
+.gal-wrap .gallery-grid .ph{display:block;break-inside:avoid;margin-bottom:6px;overflow:hidden;}
+.gal-wrap .gallery-grid .ph img{width:100%;height:auto;display:block;border-radius:0;}
+@media(max-width:900px){.gal-wrap .gallery-grid{column-count:2;}}
+@media(max-width:600px){.gal-head{padding:32px 16px 20px;}.gal-wrap{padding:0 4px 32px;}.gal-wrap .gallery-grid{column-gap:4px;}.gal-wrap .gallery-grid .ph{margin-bottom:4px;}}
