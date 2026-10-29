@@ -260,7 +260,7 @@ footer.site .fine{font-size:.75rem;}
 .hero-bg.full{background:#1d1510;}
 .hero-bg.full::before{display:none;}
 .hero:has(.hero-bg.full) .hero-bg::after{background:linear-gradient(to bottom,rgba(20,14,10,.25),rgba(20,14,10,.62));}
-.hero-bg.full img{position:absolute;inset:0;width:100%;height:100%;object-fit:cover;object-position:50% 32%;z-index:0;transform:none;max-width:none;}
+.hero-bg.full img{position:absolute;inset:0;width:100%;height:100%;object-fit:cover;object-position:50% 68%;z-index:0;transform:none;max-width:none;}
 .hero:has(.hero-bg.full){min-height:min(92vh,900px);align-items:flex-end;padding-bottom:clamp(36px,7vh,80px);}
 @media(max-width:700px){.hero:has(.hero-bg.full){min-height:min(88svh,780px);padding-bottom:28px;}.hero:has(.hero-bg.full) .hero-bg::after{background:linear-gradient(to bottom,rgba(20,14,10,.2) 0%,rgba(20,14,10,.1) 35%,rgba(20,14,10,.78) 100%);}.hero-bg.full img{object-position:56% 20%;}.hero:has(.hero-bg.full) .hero-content{padding:0 22px;}}
 .eyebrow{font-size:clamp(.68rem,2.2vw,.8rem);}
