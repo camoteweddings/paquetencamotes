@@ -155,3 +155,10 @@ section.alt{background:#f3e9db;}
 .bg-plain .closing{text-align:center;padding:10px 0 60px;color:#fff;}
 .bg-plain .closing h2{margin-bottom:10px;}
 .bg-plain .closing p{margin-bottom:20px;}
+.split{display:grid;grid-template-columns:1fr 1fr;gap:44px;align-items:center;}
+.split-img{width:100%;height:auto;aspect-ratio:3/2;object-fit:cover;border-radius:12px;}
+.split-txt{text-align:left;}
+.split-txt .lead{margin-left:0;margin-right:0;}
+@media(max-width:760px){.split{grid-template-columns:1fr;gap:24px;}.split-txt{text-align:center;}}
+.split-txt .lead,.split-txt h2,.split-txt .eyebrow{text-align:left;}
+@media(max-width:760px){.split-txt .lead,.split-txt h2,.split-txt .eyebrow{text-align:center;}}
