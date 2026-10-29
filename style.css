@@ -114,3 +114,18 @@ section.alt{background:#f3e9db;}
 .lightbox-arrow svg{width:20px;height:20px;stroke-width:1;}
 .lightbox-arrow:active{opacity:.6;}
 }
+/* Paquetes: foto de fondo */
+.bg-photo{position:relative;background:#1d1510 url(https://res.cloudinary.com/rauzqcoj/image/upload/f_auto,q_auto,c_limit,w_2000/v1787802239/galeria-15.jpg) top center/100% auto no-repeat;color:#fff;}
+.bg-photo::before{content:"";position:absolute;inset:0;background:linear-gradient(to bottom,rgba(29,21,16,.6) 0,rgba(29,21,16,.6) 24vw,#1d1510 26.3vw);}
+.bg-photo section{position:relative;background:transparent;}
+.bg-photo h2,.bg-photo .lead,.bg-photo .eyebrow{color:#fff;}
+.bg-photo .eyebrow{color:#f0cfa9;}
+.bg-photo .pkg,.bg-photo .tbl{background:rgba(255,255,255,.2);border:1px solid rgba(255,255,255,.35);-webkit-backdrop-filter:blur(6px);backdrop-filter:blur(6px);color:#fff;}
+.bg-photo .tbl{border-radius:10px;padding:16px;}
+.bg-photo .pkg h3{color:#fff;}
+.bg-photo .pkg .price{color:#f6d3b0;}
+.bg-photo .pkg ul{color:#fff;}
+.bg-photo .pkg ul li{border-bottom-color:rgba(255,255,255,.3);}
+.bg-photo .pkg.featured{border-color:#f0cfa9;box-shadow:0 8px 28px rgba(0,0,0,.35);}
+.bg-photo table th,.bg-photo table td,.bg-photo caption{color:#fff;}
+.bg-photo table tr{border-color:rgba(255,255,255,.35) !important;}
