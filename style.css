@@ -271,3 +271,6 @@ h2{font-size:clamp(1.45rem,4.6vw,2.2rem);line-height:1.25;}
 .lead{font-size:clamp(.95rem,2.8vw,1.1rem);line-height:1.65;padding:0 4px;}
 .cta{font-size:clamp(.78rem,2.6vw,.9rem);padding:clamp(11px,3vw,14px) clamp(22px,6vw,32px);}
 @media(max-width:600px){section{padding:48px 0;}.hero h1{font-size:1.6rem;}.hero-content p{font-size:.95rem;}}
+
+.pkg{position:relative;}
+.pkg .badge{position:absolute;top:12px;left:12px;z-index:3;background:var(--terracotta);color:#fff;font-size:.7rem;letter-spacing:1.5px;text-transform:uppercase;padding:6px 12px;border-radius:999px;box-shadow:0 2px 10px rgba(0,0,0,.3);}
