@@ -204,7 +204,7 @@
   .cta p { margin: 0; color: var(--gold-soft); font-size: 18px; font-weight: 700; font-family: 'Playfair Display', Georgia, serif; }
   .cta a.btn { display: inline-block; margin-top: 16px; background: var(--gold); color: var(--night); text-decoration: none; font-weight: 700; font-size: 13.5px; letter-spacing: 1px; text-transform: uppercase; padding: 14px 28px; border-radius: 2px; }
   .cta a.btn:hover { background: var(--gold-soft); }
-  .contract { padding: 14px 24px 36px; text-align: center; font-size: 12px; letter-spacing: 0.5px; color: var(--muted); }
+  .contract { padding: 14px 24px 64px; text-align: center; font-size: 12px; letter-spacing: 0.5px; color: var(--muted); }
 
   @media (min-width: 700px) {
     .section { padding-left: 64px; padding-right: 64px; }
@@ -243,7 +243,7 @@
   .gl-top { top: 0; left: 0; right: 0; height: 34px; background: url("data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' width='120' height='34' viewBox='0 0 120 34'><path d='M0,4 Q60,26 120,4' stroke='%231f6b3f' stroke-width='2.4' fill='none'/><path d='M0,4 Q60,26 120,4' stroke='%234fb37c' stroke-width='.9' stroke-dasharray='2 3' fill='none'/></svg>") repeat-x 0 0; }
   .gl-top::before { background-image: url("data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' width='120' height='34' viewBox='0 0 120 34'><circle cx='15' cy='9' r='8' fill='%23ff5a5a' opacity='.22'/><circle cx='15' cy='9' r='3.2' fill='%23ff5a5a'/><circle cx='14' cy='8' r='1' fill='%23fff' opacity='.8'/><circle cx='75' cy='14' r='8' fill='%23bfe3ff' opacity='.22'/><circle cx='75' cy='14' r='3.2' fill='%23bfe3ff'/><circle cx='74' cy='13' r='1' fill='%23fff' opacity='.8'/></svg>"); background-repeat: repeat-x; animation: glA 2.6s ease-in-out infinite; }
   .gl-top::after { background-image: url("data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' width='120' height='34' viewBox='0 0 120 34'><circle cx='45' cy='14' r='8' fill='%23ffd36b' opacity='.22'/><circle cx='45' cy='14' r='3.2' fill='%23ffd36b'/><circle cx='44' cy='13' r='1' fill='%23fff' opacity='.8'/><circle cx='105' cy='9' r='8' fill='%235be08c' opacity='.22'/><circle cx='105' cy='9' r='3.2' fill='%235be08c'/><circle cx='104' cy='8' r='1' fill='%23fff' opacity='.8'/></svg>"); background-repeat: repeat-x; animation: glB 2.6s ease-in-out infinite; }
-  .gl-side { top: 34px; bottom: 0; width: 18px; overflow: hidden; background: url("data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' width='34' height='120' viewBox='0 0 34 120'><path d='M4,0 Q30,60 4,120' stroke='%231f6b3f' stroke-width='2.4' fill='none'/><path d='M4,0 Q30,60 4,120' stroke='%234fb37c' stroke-width='.9' stroke-dasharray='2 3' fill='none'/></svg>") repeat-y 0 0 / 34px 120px; }
+  .gl-side { top: 0; bottom: 0; width: 18px; overflow: hidden; background: url("data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' width='34' height='120' viewBox='0 0 34 120'><path d='M4,0 Q30,60 4,120' stroke='%231f6b3f' stroke-width='2.4' fill='none'/><path d='M4,0 Q30,60 4,120' stroke='%234fb37c' stroke-width='.9' stroke-dasharray='2 3' fill='none'/></svg>") repeat-y 0 0 / 34px 120px; }
   .gl-side::before { background-image: url("data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' width='34' height='120' viewBox='0 0 34 120'><circle cx='10' cy='15' r='8' fill='%23ffd36b' opacity='.22'/><circle cx='10' cy='15' r='3.2' fill='%23ffd36b'/><circle cx='9' cy='14' r='1' fill='%23fff' opacity='.8'/><circle cx='16' cy='75' r='8' fill='%23ff5a5a' opacity='.22'/><circle cx='16' cy='75' r='3.2' fill='%23ff5a5a'/><circle cx='15' cy='74' r='1' fill='%23fff' opacity='.8'/></svg>"); background-repeat: repeat-y; background-size: 34px 120px; animation: glA 2.6s ease-in-out infinite; }
   .gl-side::after { background-image: url("data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' width='34' height='120' viewBox='0 0 34 120'><circle cx='16' cy='45' r='8' fill='%23bfe3ff' opacity='.22'/><circle cx='16' cy='45' r='3.2' fill='%23bfe3ff'/><circle cx='15' cy='44' r='1' fill='%23fff' opacity='.8'/><circle cx='10' cy='105' r='8' fill='%235be08c' opacity='.22'/><circle cx='10' cy='105' r='3.2' fill='%235be08c'/><circle cx='9' cy='104' r='1' fill='%23fff' opacity='.8'/></svg>"); background-repeat: repeat-y; background-size: 34px 120px; animation: glB 2.6s ease-in-out infinite; }
   .gl-left { left: 0; }
@@ -322,7 +322,10 @@
 
 
   /* ---- guirnalda en movimiento con el scroll ---- */
-  .gl-top, .gl-top::before, .gl-top::after { background-position: calc(var(--gs, 0) * -0.7px) 0; }
+  .gl-top { position: absolute; }
+  .gl-bottom { position: absolute; left: 0; right: 0; bottom: 0; top: auto; height: 34px; transform: scaleY(-1); background: url("data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' width='120' height='34' viewBox='0 0 120 34'><path d='M0,4 Q60,26 120,4' stroke='%231f6b3f' stroke-width='2.4' fill='none'/><path d='M0,4 Q60,26 120,4' stroke='%234fb37c' stroke-width='.9' stroke-dasharray='2 3' fill='none'/></svg>") repeat-x 0 0; }
+  .gl-bottom::before { background-image: url("data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' width='120' height='34' viewBox='0 0 120 34'><circle cx='15' cy='9' r='8' fill='%23ff5a5a' opacity='.22'/><circle cx='15' cy='9' r='3.2' fill='%23ff5a5a'/><circle cx='14' cy='8' r='1' fill='%23fff' opacity='.8'/><circle cx='75' cy='14' r='8' fill='%23bfe3ff' opacity='.22'/><circle cx='75' cy='14' r='3.2' fill='%23bfe3ff'/><circle cx='74' cy='13' r='1' fill='%23fff' opacity='.8'/></svg>"); background-repeat: repeat-x; animation: glA 2.6s ease-in-out infinite; }
+  .gl-bottom::after { background-image: url("data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' width='120' height='34' viewBox='0 0 120 34'><circle cx='45' cy='14' r='8' fill='%23ffd36b' opacity='.22'/><circle cx='45' cy='14' r='3.2' fill='%23ffd36b'/><circle cx='44' cy='13' r='1' fill='%23fff' opacity='.8'/><circle cx='105' cy='9' r='8' fill='%235be08c' opacity='.22'/><circle cx='105' cy='9' r='3.2' fill='%235be08c'/><circle cx='104' cy='8' r='1' fill='%23fff' opacity='.8'/></svg>"); background-repeat: repeat-x; animation: glB 2.6s ease-in-out infinite; }
   .gl-side, .gl-side::before, .gl-side::after { background-position: 0 calc(var(--gs, 0) * -0.7px); }
 
   /* ---- nieve ---- */
@@ -636,6 +639,7 @@ fbq('track', 'PageView');
     <div class="lb-count" id="lbCount"></div>
   </div>
   <div class="gl gl-top" aria-hidden="true"></div>
+  <div class="gl gl-bottom" aria-hidden="true"></div>
   <div class="gl gl-side gl-left" aria-hidden="true"></div>
   <div class="gl gl-side gl-right" aria-hidden="true"></div>
   <div class="snd-toast" id="sndToast" role="dialog" aria-live="polite" aria-label="Música de fondo">
