@@ -94,7 +94,7 @@
   .hero-facts div::before { content: "❄"; color: var(--gold); flex-shrink: 0; }
   .hero-cta { display: inline-block; margin-top: 26px; background: var(--gold); color: var(--night); text-decoration: none; font-weight: 700; font-size: 13.5px; letter-spacing: 1px; text-transform: uppercase; padding: 15px 30px; border-radius: 2px; }
   .hero-cta:hover { background: var(--gold-soft); }
-  .hero-disclaimer { position: absolute; left: 24px; bottom: 14px; z-index: 1; font-size: 10.5px; color: rgba(231,223,211,0.55); letter-spacing: 0.2px; }
+  .hero-disclaimer { margin: 16px 0 0; max-width: 40ch; font-size: 13.5px; line-height: 1.4; font-weight: 600; color: var(--gold-soft); letter-spacing: 0.2px; }
 
   /* wavy divider */
   .wave-divider { position: absolute; left: 0; right: 0; bottom: -1px; line-height: 0; z-index: 1; }
@@ -328,6 +328,18 @@
   .gl-bottom::after { background-image: url("data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' width='120' height='34' viewBox='0 0 120 34'><circle cx='45' cy='14' r='8' fill='%23ffd36b' opacity='.22'/><circle cx='45' cy='14' r='3.2' fill='%23ffd36b'/><circle cx='44' cy='13' r='1' fill='%23fff' opacity='.8'/><circle cx='105' cy='9' r='8' fill='%235be08c' opacity='.22'/><circle cx='105' cy='9' r='3.2' fill='%235be08c'/><circle cx='104' cy='8' r='1' fill='%23fff' opacity='.8'/></svg>"); background-repeat: repeat-x; animation: glB 2.6s ease-in-out infinite; }
   .gl-side, .gl-side::before, .gl-side::after { background-position: 0 calc(var(--gs, 0) * -0.7px); }
 
+
+  /* ---- hero en móvil: el contenido define el alto, nada queda tapado por la onda ---- */
+  @media (max-width: 899px) {
+    .hero { height: auto; max-height: none; min-height: 0; padding: 64px 0 104px; }
+    .hero-text { position: relative; top: auto; left: auto; right: auto; transform: none; padding: 0 24px; }
+  }
+
+
+  /* ---- video del set 2026 ---- */
+  .set-video { margin: 36px auto 0; width: min(340px, calc(100% - 48px)); aspect-ratio: 9 / 16; border-radius: 14px; overflow: hidden; background: #0d1a14; border: 1px solid rgba(201,162,75,0.45); box-shadow: 0 10px 28px rgba(0,0,0,0.35); }
+  .set-video video { width: 100%; height: 100%; object-fit: contain; display: block; background: #000; }
+
   /* ---- nieve ---- */
   body { position: relative; }
   #snowFall { position: fixed; inset: 0; width: 100%; height: 100%; pointer-events: none; z-index: 30; }
@@ -370,6 +382,7 @@ fbq('track', 'PageView');
         <div>También fotos con tu mascota (pequeña o mediana)</div>
       </div>
       <a class="hero-cta" href="#paquetes">Ver paquetes y fechas</a>
+      <p class="hero-disclaimer">Las imágenes son del año pasado. El set de este año es diferente.</p>
     </div>
     <div class="hero-deco" aria-hidden="true">
       <div class="deco-star" style="top:11%; left:7%; width:46px; height:46px; transform:rotate(-8deg);">
@@ -430,8 +443,14 @@ fbq('track', 'PageView');
     </div>
 
     <div class="gallery-head">
-      <span class="steps-eyebrow">Minis de Navidad</span>
-      <h2 class="serif">Así se ven nuestras sesiones</h2>
+      <span class="steps-eyebrow">Nuevo set 2026</span>
+      <h2 class="serif">Así es el set de este año</h2>
+    </div>
+    <div class="set-video"><video autoplay muted loop playsinline controls preload="metadata" poster="video/set-2026.jpg" aria-label="Video del set navideño de este año"><source src="video/set-2026.mp4" type="video/mp4"></video></div>
+
+    <div class="gallery-head">
+      <span class="steps-eyebrow">Minis de Navidad 2025</span>
+      <h2 class="serif">Así fueron nuestras sesiones el año pasado</h2>
     </div>
     <div class="gallery-grid" id="galleryPreview">
       <a href="https://res.cloudinary.com/rauzqcoj/image/upload/f_auto,q_auto,w_1600,c_limit/VFR_0869" data-i="10"><img src="https://res.cloudinary.com/rauzqcoj/image/upload/f_auto,q_auto,w_500,h_500,c_fill,g_auto/VFR_0869" alt="Mini sesión de Navidad en familia" loading="lazy"></a>
@@ -448,7 +467,7 @@ fbq('track', 'PageView');
       <a class="px" href="https://res.cloudinary.com/rauzqcoj/image/upload/f_auto,q_auto,w_1600,c_limit/VFR_6141" data-i="7"><img src="https://res.cloudinary.com/rauzqcoj/image/upload/f_auto,q_auto,w_500,h_500,c_fill,g_auto/VFR_6141" alt="Mini sesión de Navidad en familia" loading="lazy"></a>
     </div>
     <div style="text-align:center;margin-top:20px;"><button type="button" id="galleryOpen" class="card-cta" style="width:auto;padding:12px 28px;">Ver galería</button></div>
-    <div class="note" style="text-align:center;">La galería completa incluye también fotos de las Minis de Navidad 2025 — el set y la decoración de este año pueden variar.</div>
+    <div class="note" style="text-align:center;font-size:14px;font-style:normal;font-weight:600;color:var(--gold-soft);padding-top:14px;">Todas estas imágenes son del año pasado. El set y la decoración de este año son diferentes.</div>
 
     <div class="section" style="padding-top:40px;">
       <span class="label">Paquetes</span>
@@ -658,7 +677,7 @@ fbq('track', 'PageView');
     var reduce = window.matchMedia && matchMedia('(prefers-reduced-motion: reduce)').matches;
 
     /* ---------- nieve acumulada en los bordes ---------- */
-    var TARGETS = '.card, .steps, .why, .faq, .deposit-note, .cta, .extras table, .package-select, .calendar-embed, .sample-photo, .mdf-wall, .print-stack, .gallery-grid';
+    var TARGETS = '.card, .steps, .why, .faq, .deposit-note, .cta, .extras table, .package-select, .calendar-embed, .sample-photo, .mdf-wall, .print-stack, .gallery-grid, .set-video';
     var layer = document.getElementById('snowCaps');
 
     function rng(seed) {
