@@ -340,6 +340,14 @@
   .set-video { margin: 36px auto 0; width: min(340px, calc(100% - 48px)); aspect-ratio: 9 / 16; border-radius: 14px; overflow: hidden; background: #0d1a14; border: 1px solid rgba(201,162,75,0.45); box-shadow: 0 10px 28px rgba(0,0,0,0.35); }
   .set-video video { width: 100%; height: 100%; object-fit: contain; display: block; background: #000; }
 
+
+  /* ---- calendario visible bajo cada paquete ---- */
+  .cards .pkg { flex: 1 1 300px; min-width: 0; display: flex; flex-direction: column; gap: 14px; }
+  .cards .pkg .card { flex: none; }
+  .cards .pkg .cal-title { margin-top: 30px; font-family: 'Playfair Display', Georgia, serif; font-weight: 700; font-size: 18px; color: var(--cream); text-align: center; }
+  .cards .pkg .calendar-embed { margin: 14px 0 0; height: 600px; }
+  @media (max-width: 500px) { .cards .pkg .calendar-embed { height: 700px; } }
+
   /* ---- nieve ---- */
   body { position: relative; }
   #snowFall { position: fixed; inset: 0; width: 100%; height: 100%; pointer-events: none; z-index: 30; }
@@ -423,7 +431,7 @@ fbq('track', 'PageView');
       <h2 class="serif">De la reserva a tus fotos impresas</h2>
     </div>
     <div class="steps">
-      <div class="step-row"><span class="step-num serif">01</span><span class="step-title">Eliges tu paquete y reservas tu fecha en el calendario</span></div>
+      <div class="step-row"><span class="step-num serif">01</span><span class="step-title">Eliges tu paquete y reservas tu fecha en el calendario que aparece debajo de cada uno</span></div>
       <div class="step-row"><span class="step-num serif">02</span><span class="step-title">Sesión en nuestro set navideño, ya ambientado con una decoración elegante</span></div>
       <div class="step-row"><span class="step-num serif">03</span><span class="step-title">Sesión guiada de 30 o 45 minutos, relajada y a ritmo de niños</span></div>
       <div class="step-row"><span class="step-num serif">04</span><span class="step-title">Seleccionas tus fotos favoritas de la galería en línea</span></div>
@@ -473,6 +481,7 @@ fbq('track', 'PageView');
       <span class="label">Paquetes</span>
     </div>
     <div class="cards" id="paquetes">
+      <div class="pkg">
       <div class="card" data-package="Mini Sesión" data-booking-ns="minis-navidenas" data-booking-link="camoteweddings/minis-navidenas">
         <span class="name serif">Mini Sesión</span>
         <span class="price serif">Bs.350</span>
@@ -480,12 +489,19 @@ fbq('track', 'PageView');
         <p>30 minutos de sesión + 8 fotos digitales editadas + galería en línea</p>
         <button type="button" class="card-cta" onclick="reservarPaquete(this)">Elegir fecha y horario</button>
       </div>
+        <div class="cal-title" id="cal-mini-t">Fechas disponibles — Mini Sesión</div>
+        <div class="calendar-embed" id="cal-mini" data-for="Mini Sesión"></div>
+      </div>
+      <div class="pkg">
       <div class="card premium" data-package="Sesión Extendida" data-booking-ns="minis-navidenas-45-min" data-booking-link="camoteweddings/minis-navidenas-45-min">
         <span class="name serif">Sesión Extendida</span>
         <span class="price serif">Bs.550</span>
         <hr>
         <p>45 minutos de sesión + 15 fotos digitales editadas + 15 fotos impresas 10x15 + galería en línea</p>
         <button type="button" class="card-cta" onclick="reservarPaquete(this)">Elegir fecha y horario</button>
+      </div>
+        <div class="cal-title" id="cal-ext-t">Fechas disponibles — Sesión Extendida</div>
+        <div class="calendar-embed" id="cal-ext" data-for="Sesión Extendida"></div>
       </div>
     </div>
 
@@ -575,7 +591,7 @@ fbq('track', 'PageView');
     (function (C, A, L) { let p = function (a, ar) { a.q.push(ar); }; let d = C.document; C.Cal = C.Cal || function () { let cal = C.Cal; let ar = arguments; if (!cal.loaded) { cal.ns = {}; cal.q = cal.q || []; d.head.appendChild(d.createElement("script")).src = A; cal.loaded = true; } if (ar[0] === L) { const api = function () { p(api, arguments); }; const namespace = ar[1]; api.q = api.q || []; if(typeof namespace === "string"){cal.ns[namespace] = cal.ns[namespace] || api;p(cal.ns[namespace], ar);p(cal, ["initNamespace", namespace]);} else p(cal, ar); return;} p(cal, ar); }; })(window, "https://app.cal.com/embed/embed.js", "init");
     ["minis-navidenas", "minis-navidenas-45-min"].forEach(function (ns) {
       Cal("init", ns, {origin:"https://app.cal.com"});
-      Cal.ns[ns]("ui", {"hideEventTypeDetails":false,"layout":"month_view"});
+      Cal.ns[ns]("ui", {"hideEventTypeDetails":true,"layout":"month_view"});
       Cal.ns[ns]("on", {
         action: "bookingSuccessful",
         callback: function (e) {
@@ -589,6 +605,27 @@ fbq('track', 'PageView');
         }
       });
     });
+
+    (function () {
+      var cards = document.querySelectorAll('.card[data-booking-ns]');
+      function mount(card) {
+        var box = card.parentElement.querySelector('.calendar-embed');
+        if (!box || box.getAttribute('data-ready')) return;
+        box.setAttribute('data-ready', '1');
+        var nombre = card.getAttribute('data-package'), precio = card.querySelector('.price').textContent.trim();
+        Cal.ns[card.getAttribute('data-booking-ns')]('inline', {
+          elementOrSelector: '#' + box.id,
+          calLink: card.getAttribute('data-booking-link'),
+          config: { layout: 'month_view', notes: 'Paquete: ' + nombre + ' (' + precio + ')' }
+        });
+      }
+      if ('IntersectionObserver' in window) {
+        var io = new IntersectionObserver(function (en) {
+          en.forEach(function (x) { if (x.isIntersecting) { mount(x.target.querySelector('.card')); io.unobserve(x.target); } });
+        }, { rootMargin: '600px 0px' });
+        document.querySelectorAll('.cards .pkg').forEach(function (n) { io.observe(n); });
+      } else { cards.forEach(mount); }
+    })();
 
     document.addEventListener('DOMContentLoaded', function () {
       var IDS = ['VFR_6117','VFR_6120','VFR_6121','VFR_6125','VFR_6128-Editar','VFR_6132','VFR_6138','VFR_6141','VFR_6143','VFR_6145-Editar','VFR_0869','VFR_0456','VFR_0486','VFR_0621','VFR_0464','VFR_0493','VFR_0609','VFR_0636','VFR_0444','VFR_0482','VFR_0508','VFR_0532','VFR_0554','VFR_0572','VFR_0599','VFR_0638','VFR_0642','VFR_0866','VFR_0872','VFR_0876','VFR_0880','VFR_0884','VFR_0886','VFR_0889','VFR_0448','VFR_0461','VFR_0462','VFR_0477','VFR_0489','VFR_0497','VFR_0515','VFR_0525','VFR_0530','VFR_0547','VFR_0563','VFR_0586','VFR_0595','VFR_0604','VFR_0640','VFR_0879'], BASE = 'https://res.cloudinary.com/rauzqcoj/image/upload/';
@@ -639,10 +676,8 @@ fbq('track', 'PageView');
       var m = precio.match(/\d+(?:[.,]\d+)?/);
       var valor = m ? parseFloat(m[0].replace(',', '.')) : 0;
       if (typeof trackInitiateCheckout === 'function') trackInitiateCheckout(valor, 'BOB', nombre);
-      Cal.ns[card.getAttribute('data-booking-ns')]("modal", {
-        calLink: card.getAttribute('data-booking-link'),
-        config: { layout: "month_view", month: "2026-11", notes: "Paquete: " + nombre + " (" + precio + ")" }
-      });
+      var box = card.parentElement.querySelector('.calendar-embed');
+      if (box) box.scrollIntoView({ behavior: 'smooth', block: 'center' });
     }
   </script>
 
